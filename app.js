@@ -43,6 +43,37 @@
   ["Sentry","Annihilus"],["Sentry","Viper"],["Silver Surfer","Brood"],["Silver Surfer","Nova"],["Silver Surfer","Killmonger"],["Silver Surfer","Sebastian Shaw"],["Darkhawk","Rockslide"],["Darkhawk","Korg"],["Thanos","Lockjaw"],["Thanos","Mockingbird"],["Thanos","Cull Obsidian"],["Thanos","Blob"],["High Evolutionary","Hulk"],["High Evolutionary","Cyclops"],["High Evolutionary","The Thing"]
  ];
  const pairSet=new Set(packagePairs.map(pair=>pair.map(norm).sort().join("|")));
+ const comboGuides=new Map([
+  {a:"Deadpool",b:"Carnage",setup:"Deadpool",payoff:"Carnage",text:"Pon Deadpool primero en la ubicación y juega Carnage allí después; Deadpool vuelve a tu mano con el poder duplicado y Carnage gana +2 por cada carta que destruye."},
+  {a:"Deadpool",b:"Deathlok",setup:"Deadpool",payoff:"Deathlok",text:"Deja Deadpool en mesa y juega Deathlok en la misma ubicación para destruirlo; volverá a tu mano con el poder duplicado."},
+  {a:"Deadpool",b:"Venom",setup:"Deadpool",payoff:"Venom",text:"Juega Deadpool antes que Venom en la misma ubicación. Venom lo destruye y suma su poder; Deadpool vuelve a tu mano duplicado."},
+  {a:"Deadpool",b:"Hulkbuster",setup:"Deadpool",payoff:"Hulkbuster",text:"Juega Deadpool primero y Hulkbuster después en su ubicación para fusionarlos; el Deadpool más fuerte podrá volver a crecer con futuras destrucciones."},
+  {a:"X-23",b:"Carnage",setup:"X-23",payoff:"Carnage",text:"Juega X-23 antes que Carnage en la misma ubicación. Si se destruye, regresa y da +1 de energía al turno siguiente."},
+  {a:"X-23",b:"Deathlok",setup:"X-23",payoff:"Deathlok",text:"Juega X-23 antes que Deathlok en la misma ubicación. Si se destruye, regresa y da +1 de energía al turno siguiente."},
+  {a:"X-23",b:"Venom",setup:"X-23",payoff:"Venom",text:"Juega X-23 antes que Venom en la misma ubicación. Si se destruye, regresa y da +1 de energía al turno siguiente."},
+  {a:"X-23",b:"Killmonger",setup:"X-23",payoff:"Killmonger",text:"Si X-23 sigue en mesa, Killmonger puede destruirla junto con las demás cartas de coste 1 y darte +1 de energía el turno siguiente."},
+  {a:"Nimrod",b:"Carnage",setup:"Nimrod",payoff:"Carnage",text:"Juega Nimrod primero y Carnage después en su ubicación. Al destruirlo, Nimrod añade copias en las otras dos ubicaciones."},
+  {a:"Nimrod",b:"Deathlok",setup:"Nimrod",payoff:"Deathlok",text:"Juega Nimrod primero y Deathlok después en su ubicación. Al destruirlo, Nimrod añade copias en las otras dos ubicaciones."},
+  {a:"Nimrod",b:"Venom",setup:"Nimrod",payoff:"Venom",text:"Juega Nimrod primero y Venom después en su ubicación; Venom suma el poder de Nimrod y aparecen copias en las otras ubicaciones."},
+  {a:"Bucky Barnes",b:"Carnage",setup:"Bucky Barnes",payoff:"Carnage",text:"Juega Bucky primero y Carnage después en la misma ubicación para reemplazarlo por Winter Soldier y aumentar el poder de Carnage."},
+  {a:"Bucky Barnes",b:"Deathlok",setup:"Bucky Barnes",payoff:"Deathlok",text:"Juega Bucky primero y Deathlok después en su ubicación para reemplazarlo por Winter Soldier."},
+  {a:"Colleen Wing",b:"Swarm",setup:"Colleen Wing",payoff:"Swarm",text:"Colleen descarta la carta de menor coste. Si Swarm es la más barata de tu mano, obtendrás dos copias de coste 0."},
+  {a:"Dracula",b:"Apocalypse",setup:"Dracula",payoff:"Apocalypse",text:"Deja Apocalypse en la mano para que Dracula pueda descartarlo al final y ganar su poder; Apocalypse vuelve con +4 de poder."},
+  {a:"MODOK",b:"Apocalypse",setup:"MODOK",payoff:"Apocalypse",text:"Intenta tener Apocalypse en la mano al resolver MODOK. Al descartarse, volverá con +4 de poder; controla qué otras cartas quieres descartar."},
+  {a:"Human Torch",b:"Iron Fist",setup:"Iron Fist",payoff:"Human Torch",text:"Juega primero Iron Fist y después Human Torch: Iron Fist mueve la siguiente carta que juegues y Human Torch duplica su poder al moverse."},
+  {a:"Dagger",b:"Cloak",setup:"Cloak",payoff:"Dagger",text:"Juega Cloak y prepara el movimiento de Dagger hacia una ubicación con varios rivales; Dagger gana poder por cada enemigo allí."},
+  {a:"Kitty Pryde",b:"Angela",setup:"Angela",payoff:"Kitty Pryde",text:"Pon Angela en la ubicación primero y vuelve a jugar Kitty allí cuando regrese a tu mano para activar Angela cada turno."},
+  {a:"Beast",b:"Kitty Pryde",setup:"Beast",payoff:"Kitty Pryde",text:"Beast devuelve tus otras cartas de su ubicación a la mano y les reduce el coste para el próximo turno; Kitty puede volver a entrar por menos."},
+  {a:"Wong",b:"White Tiger",setup:"Wong",payoff:"White Tiger",text:"Juega Wong antes de White Tiger en la misma ubicación: Wong repite el efecto y crea más Tigres. Deja espacio en las otras ubicaciones."},
+  {a:"Wong",b:"Odin",setup:"Wong",payoff:"Odin",text:"Wong primero; luego usa cartas On Reveal en esa ubicación. Odin repite esos efectos al final, así que reserva huecos para sus invocaciones."},
+  {a:"Black Panther",b:"Arnim Zola",setup:"Black Panther",payoff:"Arnim Zola",text:"Juega Black Panther y después Arnim Zola en esa ubicación; Zola destruye al Panther y crea copias en las otras ubicaciones."},
+  {a:"Iron Man",b:"Mystique",setup:"Iron Man",payoff:"Mystique",text:"Juega Iron Man antes que Mystique; Mystique copia su habilidad continua. Procura que ambas queden en la ubicación que quieres potenciar."},
+  {a:"Patriot",b:"Ultron",setup:"Patriot",payoff:"Ultron",text:"Juega Patriot antes de Ultron para que los Drones sin habilidad que despliega reciban +2 de poder."},
+  {a:"Sentry",b:"Annihilus",setup:"Sentry",payoff:"Annihilus",text:"Sentry coloca un Void de poder negativo a la derecha; juega Annihilus después para enviarlo al rival o destruirlo si no puede cambiar de lado."},
+  {a:"Darkhawk",b:"Rockslide",setup:"Rockslide",payoff:"Darkhawk",text:"Rockslide mete Rocas en el mazo rival y Darkhawk gana poder por cada carta que quede allí. Puedes jugar Rockslide antes de Darkhawk."},
+  {a:"Mister Negative",b:"Jane Foster",setup:"Mister Negative",payoff:"Jane Foster",text:"Activa Mister Negative antes de Jane Foster; luego Jane roba las cartas del mazo que ahora cuestan 0."}
+ ].map(guide=>[[norm(guide.a),norm(guide.b)].sort().join("|"),guide]));
+ function comboGuide(a,b){return comboGuides.get([norm(a&&a.name),norm(b&&b.name)].sort().join("|"))||null}
  const winKeys={
   destroy:["Knull","Death","Deadpool","Nimrod","Arnim Zola","Taskmaster"],
   discard:["Apocalypse","Hela","Morbius","Dracula","MODOK","Proxima Midnight"],
@@ -164,18 +195,37 @@
   if(bucky)return current("Bucky Barnes")?"Juega primero a Bucky Barnes y después a "+destroyer.name+" en su ubicación para cambiarlo por Winter Soldier.":"Si Bucky sigue en mesa, destrúyelo con "+destroyer.name+" para dejar Winter Soldier en su lugar.";
   return "Secuencia de destrucción: primero deja en mesa la carta que quieres destruir; después juega "+destroyer.name+" en esa misma ubicación. Revisa qué objetivos hay allí antes de resolverlo."
  }
+ function comboPlanAdvice(cards,played,future){
+  const current=name=>cards.some(card=>norm(card.name)===norm(name)),wasPlayed=name=>played.some(card=>norm(card.name)===norm(name)),isFuture=name=>future.some(card=>norm(card.name)===norm(name));
+  for(const guide of comboGuides.values()){
+   const setup=guide.setup,payoff=guide.payoff,setupRelevant=current(setup)||wasPlayed(setup),payoffRelevant=current(payoff)||wasPlayed(payoff)||isFuture(payoff);
+   if(!setupRelevant||!payoffRelevant)continue;
+   if(current(setup)&&current(payoff))return "Ordena el combo: primero "+setup+" y después "+payoff+". "+guide.text;
+   if(current(setup)&&isFuture(payoff))return "Prepara "+setup+" ahora y guarda "+payoff+" para cuando te salga. "+guide.text;
+   if(current(payoff)&&(wasPlayed(setup)||current(setup)))return "Ya preparaste "+setup+"; ahora ejecuta "+payoff+". "+guide.text;
+   if(current(payoff)&&isFuture(setup))return "Si puedes, juega primero "+setup+" y reserva "+payoff+" para después. "+guide.text
+  }
+  return ""
+ }
  function orderTurnCards(cards){
   const targets=new Set(["deadpool","x 23","nimrod","bucky barnes","nova","wolverine"]);
-  if(!cards.some(isDestroyEffect))return cards;
-  return [...cards].sort((a,b)=>{
+  const ordered=[...cards];
+  for(const guide of comboGuides.values()){
+   const setup=ordered.findIndex(card=>norm(card.name)===norm(guide.setup)),payoff=ordered.findIndex(card=>norm(card.name)===norm(guide.payoff));
+   if(setup>=0&&payoff>=0&&setup>payoff){const [card]=ordered.splice(setup,1);ordered.splice(payoff,0,card)}
+  }
+  if(!ordered.some(isDestroyEffect))return ordered;
+  return ordered.sort((a,b)=>{
    const rank=card=>targets.has(norm(card.name))?0:isDestroyEffect(card)?2:1;
    return rank(a)-rank(b)
   })
  }
- function turnAdvice(turn,cards,spent,played){
+ function turnAdvice(turn,cards,spent,played,future){
   if(!cards.length)return "Guarda la energía si no tienes una jugada que avance tu plan.";
   const special=specialLineAdvice(cards,played);
   if(special)return special;
+  const guide=comboPlanAdvice(cards,played,future||[]);
+  if(guide)return guide;
   let card=cards.find(item=>played.some(other=>pairMatches(item,other))||cards.some(other=>other!==item&&pairMatches(item,other)));
   if(card){
    let partner=played.find(other=>pairMatches(card,other))||cards.find(other=>other!==card&&pairMatches(card,other));
@@ -189,7 +239,7 @@
    const bonus=turn===x23BonusTurn?1:0,energy=turn+bonus,choice=bestTurnSubset(remaining,energy,played,turn,turnLength,main);
    const ordered=orderTurnCards(choice.cards),costs=Object.fromEntries(ordered.map(card=>[card.id,plannedCost(card,played)]));
    ordered.forEach(card=>{const index=remaining.findIndex(item=>item.id===card.id);if(index>=0)remaining.splice(index,1)});
-   turns.push({turn,energy,bonus,cards:ordered,costs,spent:choice.spent,playedBefore:[...played],note:turnAdvice(turn,ordered,choice.spent,played)});
+   turns.push({turn,energy,bonus,cards:ordered,costs,spent:choice.spent,playedBefore:[...played],note:turnAdvice(turn,ordered,choice.spent,played,remaining)});
    played.push(...ordered)
    if(!x23BonusTurn&&x23Bonus(played))x23BonusTurn=turn+1
   }
@@ -254,7 +304,7 @@
   const target=app.querySelector("[data-synergies]");
   if(list.length<2){target.innerHTML='<div class="empty-analysis" style="min-height:90px"><p>Con dos o más cartas comprobaré combos concretos y familias que se apoyan entre sí.</p></div>';return}
   const links=detectSynergies(list),p=profile(list),html=[];
-  links.slice(0,5).forEach(({a,b})=>html.push('<article class="synergy-item"><strong>'+esc(a.name)+' + '+esc(b.name)+'</strong><p>Conexión de combo reconocida. Intenta ordenar el turno para que '+esc(a.name)+' prepare el efecto de '+esc(b.name)+' y evita gastar una pieza clave en una ubicación que la anule.</p></article>'));
+  links.slice(0,5).forEach(({a,b})=>{const guide=comboGuide(a,b);html.push('<article class="synergy-item"><strong>'+esc(a.name)+' + '+esc(b.name)+'</strong><p>'+esc(guide?guide.text:'Conexión de combo reconocida. Ordena las cartas para que una prepare el efecto de la otra y ten en cuenta la ubicación que necesitas.')+'</p></article>')});
   if(p.main)html.push('<article class="synergy-item"><strong>Paquete de '+esc(archetypeNames[p.main])+'</strong><p>'+p.count+' cartas apuntan a '+esc(archetypeNames[p.main].toLowerCase())+'. '+(p.count<4?"La base todavía es corta; el completador puede reforzarla.":"Hay una base reconocible para la condición de victoria y sus apoyos.")+'</p></article>');
   if(!html.length)html.push('<article class="synergy-item"><strong>Plan mixto</strong><p>No aparece un paquete clásico repetido. La curva y las alternativas por energía pesan más que forzar un arquetipo.</p></article>');
   target.innerHTML=html.join("")
