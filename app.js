@@ -234,11 +234,17 @@
   return spent===turn?"Curva limpia: gastas toda la energía; conserva el espacio de ubicación para tu siguiente pieza.":"Juega "+cards.map(item=>item.name).join(" + ")+", gastas "+spent+" de "+turn+" y mantienes una alternativa para el turno siguiente."
  }
  function buildTurnPlan(list,turnLength){
-  const remaining=[...list],played=[],turns=[],main=profile(list).main;let x23BonusTurn=0;
+  const remaining=[...list],played=[],turns=[],main=profile(list).main,baseDeadpool=cardForName("Deadpool");let x23BonusTurn=0,deadpoolPower=baseDeadpool?baseDeadpool.power:1,deadpoolOnBoard=false;
   for(let turn=1;turn<=turnLength;turn++){
    const bonus=turn===x23BonusTurn?1:0,energy=turn+bonus,choice=bestTurnSubset(remaining,energy,played,turn,turnLength,main);
    const ordered=orderTurnCards(choice.cards),costs=Object.fromEntries(ordered.map(card=>[card.id,plannedCost(card,played)]));
    ordered.forEach(card=>{const index=remaining.findIndex(item=>item.id===card.id);if(index>=0)remaining.splice(index,1)});
+   let deadpoolReturned=false;
+   for(const card of ordered){
+    if(norm(card.name)==="deadpool"){deadpoolOnBoard=true;deadpoolPower=card.power}
+    else if(isDestroyEffect(card)&&deadpoolOnBoard){deadpoolOnBoard=false;deadpoolPower*=2;deadpoolReturned=true}
+   }
+   if(deadpoolReturned&&baseDeadpool&&!remaining.some(card=>norm(card.name)==="deadpool"))remaining.push({...baseDeadpool,power:deadpoolPower});
    turns.push({turn,energy,bonus,cards:ordered,costs,spent:choice.spent,playedBefore:[...played],note:turnAdvice(turn,ordered,choice.spent,played,remaining)});
    played.push(...ordered)
    if(!x23BonusTurn&&x23Bonus(played))x23BonusTurn=turn+1
@@ -284,6 +290,8 @@
   const notes=[];
   if(deathRows.length){const item=deathRows[0];notes.push('* Death: '+item.discount+' descuentos estimados por las cartas destructoras jugadas antes. Solo cuenta si realmente destruyeron al menos '+item.discount+' cartas; su coste base es '+item.card.cost+'.')}
   if(turns.some(row=>row.bonus))notes.push('X-23: el +1 de energía depende de que se destruya después de entrar. La línea supone que se activa; si no, quédate con la energía base del turno.');
+  const baseDeadpool=cardForName("Deadpool");
+  if(baseDeadpool&&turns.some(row=>row.cards.some(card=>norm(card.name)==="deadpool"&&card.power>baseDeadpool.power)))notes.push('Deadpool: el poder de la repetición supone que volvió a tu mano al ser destruido. Si el efecto no lo destruye, no podrás repetir esa jugada; los efectos locales requieren la misma ubicación, excepto los globales como Killmonger.');
   if(notes.length)target.innerHTML+='<div class="catalog-note">'+notes.map(esc).join('<br>')+'</div>'
  }
  function renderProbabilities(list,main){
