@@ -1,191 +1,152 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#181a1f">
-  <meta name="description" content="Construye y analiza tus mazos de Marvel Snap.">
-  <meta name="application-name" content="Snap Valley">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./icon-192.svg" type="image/svg+xml">
-  <title>Snap Valley</title>
-
+ <meta charset="utf-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="theme-color" content="#0b100e">
+ <meta name="description" content="Construye mazos de Marvel Snap, analiza tu curva y completa listas con Snap Valley.">
+ <title>Snap Valley · Analizador de mazos</title>
+ <link rel="manifest" href="./manifest.webmanifest">
+ <link rel="icon" href="./icon-192.svg" type="image/svg+xml">
+ <style>
+ :root{color-scheme:dark;--bg:#0b100e;--shell:#101613;--panel:#151e19;--panel2:#1a251f;--line:#2d3b33;--ink:#eef7ef;--dim:#9eafa4;--faint:#68786e;--green:#adff38;--green2:#d4ff88;--greenbg:#1b2a17;--orange:#ffc47a;--red:#ff8c8c;--blue:#93d5ff;--radius:16px;--shadow:0 18px 55px #0005}
+ *{box-sizing:border-box}html{background:var(--bg);scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 78% -15%,#1f302533,transparent 42%),var(--bg);color:var(--ink);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+ button,input,select{font:inherit}button{color:inherit}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+ .app{display:grid;grid-template-columns:235px minmax(0,1fr);max-width:1580px;min-height:100vh;margin:0 auto}
+ .side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:26px 16px 18px;border-right:1px solid var(--line);background:#0d1310}
+ .brand{display:flex;align-items:center;gap:11px;margin:3px 9px 34px;color:var(--green);font-weight:900;letter-spacing:.09em}
+ .brand-mark{display:grid;width:38px;height:38px;place-items:center;border-radius:12px;background:var(--green);color:#11170c;font-size:20px;box-shadow:0 0 28px #adff3824}
+ .brand small{display:block;margin-top:2px;color:var(--dim);font-size:9px;letter-spacing:.17em}
+ .nav-title{margin:0 10px 9px;color:var(--faint);font-size:10px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+ .nav{display:grid;gap:6px}.nav button{display:flex;align-items:center;gap:12px;width:100%;min-height:43px;padding:0 12px;border:1px solid transparent;border-radius:11px;background:transparent;color:var(--dim);cursor:pointer;text-align:left;transition:.16s}
+ .nav button:hover{background:var(--panel);color:var(--ink)}.nav button[aria-current=page]{border-color:#52753b55;background:var(--greenbg);color:var(--green);font-weight:700}
+ .nav-icon{width:19px;text-align:center;font-size:17px}
+ .side-bottom{margin-top:auto;padding:14px 12px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(145deg,#18221c,#101613)}
+ .side-bottom strong{display:block;margin-bottom:5px;color:var(--green2);font-size:11px}.side-bottom p{margin:0;color:var(--dim);font-size:10px;line-height:1.55}
+ .main{min-width:0;padding:0 34px 40px}.top{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:15px;min-height:62px;border-bottom:1px solid #2d3b3355;background:#0b100eef;backdrop-filter:blur(14px)}
+ .crumb{color:var(--dim);font-size:12px}.crumb b{color:var(--ink);font-weight:650}.top-right{display:flex;align-items:center;gap:9px}
+ .updated{display:flex;align-items:center;gap:7px;color:var(--dim);font-size:10px}.updated i{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 11px var(--green)}
+ .page{max-width:1160px;margin:0 auto;padding-top:29px}.page[hidden]{display:none!important}
+ .hero{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:22px}.eyebrow{margin:0 0 7px;color:var(--green);font-size:10px;font-weight:800;letter-spacing:.13em;text-transform:uppercase}
+ h1{margin:0;font-size:clamp(25px,3.3vw,38px);line-height:1.08;letter-spacing:-.04em}h2{margin:0;font-size:15px;letter-spacing:-.015em}h3{margin:0;font-size:12px}.sub{max-width:720px;margin:9px 0 0;color:var(--dim);font-size:12px;line-height:1.55}
+ .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid var(--line);border-radius:999px;color:var(--dim);font-size:10px;white-space:nowrap}.pill.green{border-color:#547b3d80;background:var(--greenbg);color:var(--green2)}
+ .surface{border:1px solid var(--line);border-radius:var(--radius);background:linear-gradient(150deg,#18221c,#131a16 78%);box-shadow:var(--shadow)}
+ .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}.section-head .sub{margin-top:4px;font-size:11px}
+ .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:37px;padding:0 13px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);color:var(--ink);cursor:pointer;font-size:11px;font-weight:650;transition:.15s}
+ .btn:hover{border-color:#617765;background:#223027}.btn.primary{border-color:var(--green);background:var(--green);color:#11170b}.btn.primary:hover{background:var(--green2)}.btn.quiet{background:transparent;color:var(--dim)}.btn.small{min-height:31px;padding:0 10px;font-size:10px}.btn:disabled{opacity:.42;cursor:not-allowed}
+ .builder-board{padding:18px}.slots{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}.slot{position:relative;display:flex;min-width:0;min-height:155px;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:15px 9px 12px;border:1px dashed #5c7550;border-radius:13px;background:linear-gradient(145deg,#141c17,#101612);color:var(--dim);cursor:pointer;text-align:center;transition:.16s}
+ .slot:hover{transform:translateY(-2px);border-color:var(--green);background:#18241b}.slot.filled{border-style:solid;border-color:#54783d;background:linear-gradient(145deg,#253327,#131a16);color:var(--ink)}
+ .slot-number{position:absolute;top:8px;left:10px;color:var(--green);font-size:9px;font-weight:800;letter-spacing:.1em}.slot-cost{position:absolute;top:7px;right:8px;display:flex;align-items:center;justify-content:center;width:23px;height:23px;border-radius:50%;background:#2373ab;color:white;font-size:11px;font-weight:850;box-shadow:0 2px 7px #0005}
+ .slot-power{position:absolute;top:7px;right:35px;display:flex;align-items:center;justify-content:center;width:23px;height:23px;border-radius:50%;background:#ba7d1d;color:white;font-size:11px;font-weight:850;box-shadow:0 2px 7px #0005}
+ .slot-plus{display:grid;width:35px;height:35px;place-items:center;border:1px solid #4a6144;border-radius:50%;color:var(--green);font-size:19px}.slot.filled .slot-plus{border-color:#617e4c;background:#adff3815;font-size:12px}
+ .slot-name{max-width:100%;overflow-wrap:anywhere;color:var(--ink);font-size:11px;font-weight:700}.slot:not(.filled) .slot-name{color:var(--dim);font-size:10px;font-weight:500}.slot-ability{display:-webkit-box;max-width:100%;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;color:var(--dim);font-size:9px;line-height:1.35}
+ .builder-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;padding-top:13px;border-top:1px solid var(--line)}.status{color:var(--dim);font-size:11px}
+ .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px;margin:14px 0}.kpi{padding:15px}.kpi span{display:block;color:var(--dim);font-size:10px}.kpi strong{display:block;margin-top:5px;color:var(--green2);font-size:22px;letter-spacing:-.04em}.kpi small{display:block;margin-top:3px;color:var(--faint);font-size:9px}
+ .analysis-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(270px,.75fr);gap:13px;align-items:start}.analysis-main,.analysis-aside{display:grid;gap:13px}.panel{padding:17px}
+ .empty-analysis{display:grid;place-items:center;min-height:170px;padding:24px;border:1px dashed #435648;border-radius:13px;color:var(--dim);text-align:center}.empty-analysis strong{display:block;margin-bottom:6px;color:var(--ink);font-size:13px}.empty-analysis p{max-width:48ch;margin:0;font-size:11px;line-height:1.6}
+ .deck-mini{display:flex;flex-wrap:wrap;gap:6px}.mini-card{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:#101713;color:var(--ink);font-size:10px}
+ .mini-card b{display:inline-grid;width:18px;height:18px;place-items:center;border-radius:50%;background:#236c9b;color:white;font-size:9px}.mini-card small{color:var(--dim);font-size:9px}
+ .curve{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:9px;align-items:end;min-height:150px;padding:11px 4px 0}.curve-col{display:grid;grid-template-rows:105px auto;justify-items:center;gap:7px}.curve-rail{display:flex;width:min(28px,90%);height:100%;align-items:flex-end;overflow:hidden;border:1px solid #ffffff09;border-radius:9px 9px 3px 3px;background:#0e1411}.curve-bar{width:100%;min-height:3px;border-radius:8px 8px 2px 2px;background:linear-gradient(0deg,#669b30,var(--green));transition:height .24s}.curve-label{color:var(--dim);font-size:9px}.curve-label strong{display:block;color:var(--ink);font-size:10px;text-align:center}
+ .plan{display:grid;gap:7px}.turn{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;padding:11px;border:1px solid var(--line);border-radius:11px;background:#101713}.turn-label{color:var(--green);font-size:10px;font-weight:800}.turn-label small{display:block;margin-top:2px;color:var(--faint);font-size:9px;font-weight:500}.turn-content{min-width:0}.turn-cards{display:flex;flex-wrap:wrap;gap:5px}.turn-card{padding:4px 7px;border:1px solid #36463b;border-radius:7px;background:#19221c;font-size:10px}.turn-card b{color:var(--blue);font-size:9px}.turn-note{margin-top:5px;color:var(--dim);font-size:10px;line-height:1.45}.muted{color:var(--faint)}
+ .prob-options{display:flex;flex-wrap:wrap;gap:8px;margin:-2px 0 11px}.field,select.field{min-height:36px;padding:0 10px;border:1px solid #3a4a3f;border-radius:9px;background:#101713;color:var(--ink);font-size:11px}
+ .prob-list{display:grid;gap:8px}.prob-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#101713}.prob-row span{color:var(--dim);font-size:10px}.prob-row b{color:var(--green2);font-size:12px}
+ .synergy-list,.swaps-list{display:grid;gap:8px}.synergy-item,.swap-item{padding:10px;border:1px solid var(--line);border-radius:10px;background:#101713}.synergy-item strong,.swap-item strong{display:block;color:var(--green2);font-size:11px}.synergy-item p,.swap-item p{margin:4px 0 0;color:var(--dim);font-size:10px;line-height:1.5}
+ .location-search,.search{width:100%;min-height:40px;padding:0 11px;border:1px solid #405346;border-radius:10px;background:#0f1511;color:var(--ink);font-size:12px}
+ .location-results,.matches{display:grid;gap:5px;max-height:235px;overflow:auto;margin-top:7px}.location-result,.match-result{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#101713;cursor:pointer;text-align:left}.location-result:hover,.match-result:hover{border-color:#668d4a;background:#19241b}.location-result b,.match-result b{display:block;font-size:10px}.location-result small,.match-result small{display:block;margin-top:3px;color:var(--dim);font-size:9px;line-height:1.4}
+ .location-selected{margin-top:10px;padding:12px;border:1px solid #4f6e40;border-radius:11px;background:#1a2819}.location-selected h3{color:var(--green2)}.location-selected p{margin:5px 0 0;color:var(--dim);font-size:10px;line-height:1.5}
+ .source-box{padding:13px;border:1px solid #4d6941;border-radius:12px;background:#151f17}.source-box strong{display:block;color:var(--green2);font-size:11px}.source-box p{margin:5px 0 9px;color:var(--dim);font-size:10px;line-height:1.55}.links{display:flex;flex-wrap:wrap;gap:7px}.text-link{color:var(--green2);font-size:10px;text-decoration:none}.text-link:hover{text-decoration:underline}
+ .complete-layout{display:grid;grid-template-columns:minmax(270px,.8fr) minmax(0,1.2fr);gap:14px;align-items:start}.complete-controls{padding:17px}.complete-controls .search{margin-top:10px}.seed-pills{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.seed-pill{display:inline-flex;align-items:center;gap:7px;padding:6px 8px;border:1px solid #567442;border-radius:999px;background:#1b2918;color:var(--green2);font-size:10px}.seed-pill button{padding:0;border:0;background:transparent;color:var(--green2);cursor:pointer;font-size:13px;line-height:1}
+ .complete-result{min-height:320px;padding:17px}.recommendation-deck{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0}.rec-card{display:grid;grid-template-columns:25px minmax(0,1fr);gap:7px;align-items:center;min-width:0;padding:8px;border:1px solid var(--line);border-radius:9px;background:#101713}.rec-cost{display:grid;width:23px;height:23px;place-items:center;border-radius:50%;background:#236c9b;color:#fff;font-size:10px;font-weight:800}.rec-card strong{display:block;overflow:hidden;font-size:9px;text-overflow:ellipsis;white-space:nowrap}.rec-card small{display:block;margin-top:2px;color:var(--dim);font-size:8px}
+ .rec-why{margin:11px 0 0;padding:0;list-style:none}.rec-why li{display:grid;grid-template-columns:140px minmax(0,1fr);gap:8px;padding:8px 0;border-top:1px solid #2b3930;color:var(--dim);font-size:9px}.rec-why b{color:var(--ink);font-size:10px}
+ .alternatives{display:grid;gap:6px;margin-top:9px}.alternative{display:flex;align-items:center;justify-content:space-between;gap:9px;padding:8px;border:1px solid var(--line);border-radius:8px;color:var(--dim);font-size:9px}.alternative b{color:var(--green2);font-size:10px}
+ .catalog-note{margin-top:15px;color:var(--faint);font-size:9px;line-height:1.5}
+ .picker-scrim{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:18px;background:#000b;backdrop-filter:blur(7px)}.picker-scrim[hidden]{display:none}.picker{width:min(620px,100%);max-height:min(780px,92vh);overflow:hidden;padding:18px;border:1px solid #415449;border-radius:18px;background:#141c17;box-shadow:0 25px 100px #000b}
+ .picker-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.picker-top h2{font-size:16px}.picker-body{max-height:calc(92vh - 170px);overflow:auto;margin-top:8px}.pick-result{display:grid;grid-template-columns:27px minmax(0,1fr) auto;gap:9px;align-items:center;width:100%;padding:10px;border:1px solid var(--line);border-radius:10px;background:#101713;cursor:pointer;text-align:left}.pick-result+.pick-result{margin-top:6px}.pick-result:hover{border-color:#698c4f;background:#1a261c}.pick-result[disabled]{opacity:.45;cursor:not-allowed}.pick-name{display:block;font-size:11px;font-weight:700}.pick-ability{display:block;margin-top:3px;color:var(--dim);font-size:9px;line-height:1.4}.pick-stats{display:flex;gap:4px;color:var(--dim);font-size:9px}.modal-close{width:33px;height:33px;border:1px solid var(--line);border-radius:9px;background:var(--panel2);color:var(--ink);cursor:pointer;font-size:19px}
+ .toast{position:fixed;right:20px;bottom:20px;z-index:30;max-width:min(400px,calc(100vw - 40px));padding:12px 15px;border:1px solid #5c813f;border-radius:11px;background:#1a2819;color:var(--green2);box-shadow:var(--shadow);font-size:11px}
+ @media(max-width:1000px){.main{padding:0 22px 30px}.slots{grid-template-columns:repeat(4,minmax(0,1fr))}.analysis-grid{grid-template-columns:minmax(0,1fr) minmax(240px,.8fr)}}
+ @media(max-width:760px){.app{grid-template-columns:1fr}.side{position:static;height:auto;padding:13px 14px 10px;border-right:0;border-bottom:1px solid var(--line)}.brand{margin:0 4px 11px}.brand-mark{width:32px;height:32px;border-radius:10px;font-size:17px}.brand small{font-size:8px}.nav-title,.side-bottom{display:none}.nav{display:flex;gap:5px;overflow:auto}.nav button{min-width:92px;min-height:37px;justify-content:center;gap:5px;padding:0 8px;font-size:10px}.nav-icon{font-size:14px}.main{padding:0 14px 25px}.top{min-height:48px}.updated{font-size:9px}.page{padding-top:22px}.hero{align-items:flex-start;flex-direction:column;gap:11px;margin-bottom:16px}.analysis-grid,.complete-layout{grid-template-columns:1fr}.analysis-aside{grid-template-columns:1fr 1fr}.analysis-aside .meta-panel{grid-column:1/-1}.slots{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.slot{min-height:132px;padding:12px 6px}.slot-name{font-size:10px}.slot-ability{font-size:8px}.kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.kpi{padding:12px}.kpi strong{font-size:20px}.recommendation-deck{grid-template-columns:repeat(2,minmax(0,1fr))}}
+ @media(max-width:480px){.main{padding-right:11px;padding-left:11px}.nav button{min-width:77px;padding:0 5px;font-size:9px}.nav-icon{display:none}.updated{max-width:145px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.slots{grid-template-columns:repeat(3,minmax(0,1fr))}.slot{min-height:122px}.analysis-aside{grid-template-columns:1fr}.analysis-aside .meta-panel{grid-column:auto}.builder-board{padding:12px}.panel{padding:13px}.section-head{align-items:flex-start}.builder-bottom{align-items:flex-start;flex-direction:column}.builder-bottom .btn{width:100%}.rec-why li{grid-template-columns:100px minmax(0,1fr)}.turn{grid-template-columns:48px minmax(0,1fr);gap:7px}.curve{gap:4px}.curve-col{grid-template-rows:85px auto}.curve-rail{width:24px}}
+ </style>
 </head>
 <body>
-<div id="snap-coach"><style>
-#snap-coach { color-scheme:light dark; font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; --bg:light-dark(#f3f1ee,#111316);--shell:light-dark(#fbfaf8,#181a1f);--panel:light-dark(#fff,#202329);--soft:light-dark(#f2f0ec,#252830);--line:light-dark(#e4e0db,#343740);--ink:light-dark(#252421,#f3f1ec);--dim:light-dark(#77736d,#a3a5ad);--hot:light-dark(#152219,#ff805d);--hotbg:light-dark(#f7e8e2,#402923);--mint:light-dark(#35796c,#81d2bd);--mintbg:light-dark(#e5f1ed,#243b36);--violet:light-dark(#6e5cb0,#b4a2ff);--violetbg:light-dark(#eeeafa,#302b44);color:var(--ink); }
-#snap-coach *{box-sizing:border-box} #snap-coach [hidden]{display:none!important}
-#snap-coach .app{display:grid;grid-template-columns:205px minmax(0,1fr);max-width:1180px;min-height:790px;margin:auto;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:var(--shell);box-shadow:0 22px 65px #00000016}
-#snap-coach .side{display:flex;flex-direction:column;gap:25px;padding:22px 14px;background:var(--bg);border-right:1px solid var(--line)}
-#snap-coach .brand{display:flex;align-items:center;gap:10px;padding:0 7px;font-size:13px;font-weight:700;letter-spacing:.1em}
-#snap-coach .mark{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--hot);color:#fff;font-size:12px}
-#snap-coach .brand small{display:block;margin-top:3px;color:var(--dim);font-size:9px;letter-spacing:.13em}
-#snap-coach .nav-label{margin:0 8px 8px;color:var(--dim);font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
-#snap-coach .nav{display:grid;gap:4px}
-#snap-coach .nav button{min-height:38px;padding:0 9px;border:0;border-radius:9px;background:transparent;color:var(--dim);cursor:pointer;font:inherit;font-size:12px;text-align:left}
-#snap-coach .nav button:hover{background:var(--soft);color:var(--ink)} #snap-coach .nav button[aria-current=page]{background:var(--hotbg);color:var(--hot);font-weight:650}
-#snap-coach .spacer{flex:1} #snap-coach .trust{padding:11px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--dim);font-size:10px;line-height:1.5}
-#snap-coach .trust b{display:block;margin-bottom:4px;color:var(--ink);font-weight:600}
-#snap-coach .main{min-width:0;padding:0 25px 28px}
-#snap-coach .top{display:flex;align-items:center;justify-content:space-between;min-height:62px;border-bottom:1px solid var(--line);color:var(--dim);font-size:11px}
-#snap-coach .top b{color:var(--ink);font-weight:550}.fresh{display:flex;align-items:center;gap:7px}.fresh i{width:7px;height:7px;border-radius:50%;background:#c89d54}
-#snap-coach .page{padding-top:24px}.head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:17px}
-#snap-coach .eyebrow{margin:0 0 6px;color:var(--hot);font-size:9px;font-weight:750;letter-spacing:.14em;text-transform:uppercase}
-#snap-coach h1,#snap-coach h2,#snap-coach h3,#snap-coach p{margin-top:0}
-#snap-coach h1{margin-bottom:5px;font-size:24px;font-weight:600;letter-spacing:-.045em}
-#snap-coach h2{margin:0;font-size:14px;font-weight:620;letter-spacing:-.015em}
-#snap-coach h3{margin:0;font-size:11px;font-weight:620}
-#snap-coach .sub{margin:0;color:var(--dim);font-size:11px;line-height:1.5}
-#snap-coach .pill{display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border:1px solid var(--line);border-radius:99px;color:var(--dim);font-size:9px;white-space:nowrap}
-#snap-coach .demo{border-color:light-dark(#e9c9bc,#5c3c32);background:var(--hotbg);color:var(--hot)}
-#snap-coach .okay{border-color:light-dark(#bfd8d0,#3d6158);background:var(--mintbg);color:var(--mint)}
-#snap-coach .btn{min-height:34px;padding:0 11px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--ink);cursor:pointer;font:inherit;font-size:10px;font-weight:600}
-#snap-coach .primary{border-color:var(--hot);background:var(--hot);color: #a9ff35}
-#snap-coach .surface{border:1px solid var(--line);border-radius:14px;background:var(--panel)}
-#snap-coach .section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:11px}
-#snap-coach .analysis{display:grid;grid-template-columns:225px minmax(0,1fr);gap:13px;align-items:start}
-#snap-coach .deck{padding:13px}.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
-#snap-coach .card{display:flex;aspect-ratio:.8;min-width:0;flex-direction:column;justify-content:space-between;padding:6px;border:1px solid #ffffff20;border-radius:8px;background:linear-gradient(150deg,var(--a),var(--b));color:#fff;box-shadow:inset 0 -25px 35px #0007}
-#snap-coach .card b{font-size:9px;font-weight:650;line-height:1.12;text-shadow:0 1px 4px #000}.card small{font-size:8px;text-shadow:0 1px 4px #000}
-#snap-coach .r{--a:#984c43;--b:#242630}.b{--a:#397297;--b:#24293b}.p{--a:#794b91;--b:#28233b}.g{--a:#3c806e;--b:#202e35}.y{--a:#a77d39;--b:#372c2c}
-#snap-coach .deck-note{margin:10px 0 0;padding-top:9px;border-top:1px solid var(--line);color:var(--dim);font-size:9px;line-height:1.45}
-#snap-coach .analysis-right{display:grid;gap:11px}.readout{padding:15px;background:linear-gradient(125deg,var(--panel),light-dark(#f8eee7,#292321))}
-#snap-coach .readout h2{max-width:45ch}.readout p{margin:7px 0 0;color:var(--dim);font-size:11px;line-height:1.55}
-#snap-coach .plan{padding:13px}.plan-tabs{display:flex;gap:5px;padding:4px;border:1px solid var(--line);border-radius:9px;background:var(--bg)}
-#snap-coach .plan-tabs button{flex:1;min-height:29px;border:0;border-radius:6px;background:transparent;color:var(--dim);cursor:pointer;font:inherit;font-size:9px}
-#snap-coach .plan-tabs button[aria-pressed=true]{background:var(--panel);color:var(--ink);box-shadow:0 1px 3px #0002}
-#snap-coach .plan-copy{min-height:46px;margin:10px 1px 0;color:var(--dim);font-size:10px;line-height:1.5}.plan-copy strong{color:var(--ink);font-weight:620}
-#snap-coach .lower{display:grid;grid-template-columns:1fr 1fr;gap:10px}.insight{padding:12px}
-#snap-coach .insight ul{display:grid;gap:7px;margin:9px 0 0;padding:0;list-style:none}
-#snap-coach .insight li{display:grid;grid-template-columns:6px minmax(0,1fr);gap:7px;color:var(--dim);font-size:9px;line-height:1.45}
-#snap-coach .insight li:before{width:5px;height:5px;margin-top:4px;border-radius:50%;background:var(--mint);content:""}
-#snap-coach .locations li:before{background:var(--violet)}
-#snap-coach .list{display:grid;gap:9px}.row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:13px}
-#snap-coach .row-main{display:flex;align-items:center;gap:10px}.thumb{display:grid;width:38px;height:44px;place-items:center;border-radius:8px;background:linear-gradient(145deg,#954d42,#282a36);color:#fff;font-weight:700}
-#snap-coach .row h2{margin-bottom:4px;font-size:12px}.row p{margin:0;color:var(--dim);font-size:9px}
-#snap-coach .form{display:grid;gap:12px;max-width:690px}.form-section{padding:16px}
-#snap-coach .label{display:block;margin-bottom:7px;color:var(--dim);font-size:10px}
-#snap-coach input[type=text]{width:100%;min-height:40px;padding:0 11px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit;font-size:11px}
-#snap-coach .hint{margin:6px 0 0;color:var(--dim);font-size:9px;line-height:1.45}
-#snap-coach .owned{display:grid;grid-template-columns:1fr 1fr;gap:9px 12px;margin-top:12px}
-#snap-coach .owned label{display:flex;align-items:center;gap:7px;font-size:10px}#snap-coach input[type=checkbox]{width:14px;height:14px;accent-color:var(--hot)}
-#snap-coach .picks{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-#snap-coach .pick{min-height:29px;padding:0 9px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--dim);cursor:pointer;font:inherit;font-size:9px}
-#snap-coach .pick[aria-pressed=true]{border-color:var(--hot);background:var(--hotbg);color:var(--hot)}
-#snap-coach .status{min-height:14px;margin:8px 0 0;color:var(--mint);font-size:9px}
-#snap-coach .swaps{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;align-items:start}.swap{padding:15px}
-#snap-coach .pair{display:grid;grid-template-columns:1fr 22px 1fr;gap:7px;align-items:center;margin-top:12px}
-#snap-coach .piece{padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
-#snap-coach .piece small{display:block;margin-bottom:5px;color:var(--dim);font-size:8px}.piece b{font-size:11px;font-weight:620}.piece span{display:block;margin-top:4px;color:var(--dim);font-size:9px}
-#snap-coach .arrow{text-align:center;color:var(--dim)}.points{display:grid;gap:8px;margin-top:13px}
-#snap-coach .point{display:grid;grid-template-columns:55px 1fr;gap:8px;font-size:9px;line-height:1.45}.point b{font-weight:620}.point span{color:var(--dim)}
-#snap-coach .recs{display:grid;gap:8px}.rec{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:11px}
-#snap-coach .rec b{display:block;font-size:10px;font-weight:620}.rec small{display:block;margin-top:3px;color:var(--dim);font-size:9px}
-#snap-coach .mesa{grid-template-columns:1fr}.mesa .side{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:14px;padding:13px 19px;border-right:0;border-bottom:1px solid var(--line)}
-#snap-coach .mesa .nav-label,.mesa .trust,.mesa .spacer{display:none}.mesa .nav{display:flex;justify-content:flex-end;gap:3px}.mesa .nav button{min-height:32px}
-#snap-coach .mesa .main{padding-right:30px;padding-left:30px}.mesa .analysis{grid-template-columns:1fr}
-#snap-coach .mesa .deck{display:grid;grid-template-columns:100px 1fr;align-items:center;gap:12px}.mesa .deck .section-title{display:block;margin:0}.mesa .deck .pill{margin-top:7px}
-#snap-coach .mesa .cards{grid-template-columns:repeat(6,minmax(0,1fr))}.mesa .card{aspect-ratio:1.45}.mesa .card b{font-size:8px}.mesa .card small{font-size:7px}.mesa .deck-note{display:none}
-#snap-coach .mesa .analysis-right{grid-template-columns:1fr 1fr}.mesa .readout{grid-column:1/-1}
-@media(max-width:760px){#snap-coach .app{grid-template-columns:1fr;min-height:700px}.side{display:grid!important;grid-template-columns:1fr;gap:8px!important;padding:11px 13px!important;border-right:0!important;border-bottom:1px solid var(--line)}.nav-label,.trust,.spacer{display:none!important}.nav{display:flex!important;justify-content:space-between;gap:2px}.nav button{flex:1;min-height:32px!important;padding:0 3px!important;font-size:9px!important;text-align:center!important}.main,.mesa .main{padding:0 16px 24px!important}.analysis,.mesa .analysis{grid-template-columns:1fr!important}.deck,.mesa .deck{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:center}.deck .section-title{display:block;margin:0}.deck .pill{margin-top:6px}.cards,.mesa .cards{grid-template-columns:repeat(6,minmax(0,1fr))}.card,.mesa .card{aspect-ratio:1.3}.card b{font-size:7px}.card small{font-size:7px}.deck-note{display:none}.analysis-right,.mesa .analysis-right{grid-template-columns:1fr 1fr}.readout{grid-column:1/-1}}
-@media(max-width:500px){.brand small{display:none}#snap-coach h1{font-size:21px}.head{align-items:flex-start;flex-direction:column}.lower,.mesa .analysis-right,.swaps{grid-template-columns:1fr}.readout{grid-column:auto!important}.deck,.mesa .deck{grid-template-columns:1fr}.deck .section-title{display:flex;align-items:center;justify-content:space-between}.deck .pill{margin:0}.cards,.mesa .cards{grid-template-columns:repeat(4,minmax(0,1fr))}.card,.mesa .card{aspect-ratio:.85}.card b{font-size:9px}.row{grid-template-columns:1fr auto}.row .pill{display:none}.owned{grid-template-columns:1fr!important}.top{min-height:51px}.fresh{font-size:9px}}
-</style><style>
-html,body{margin:0;min-height:100%;background:#111316}body{min-height:100vh}#snap-coach{min-height:100vh;padding:18px;background:light-dark(#efede9,#111316)}@media(max-width:760px){#snap-coach{padding:0}}
-</style><div class="app coach">
-   <aside class="side">
-    <div class="brand"><span class="mark">S</span><span>SNAP VALLEY<small>DECK BUILDER</small></span></div>
-    <div><p class="nav-label">Tu espacio</p><nav class="nav" aria-label="Secciones">
-     <button data-page-target="decks">▤ &nbsp; Mis mazos</button><button data-page-target="add" aria-current="page">＋ &nbsp; Constructor</button><button data-page-target="analysis">✳ &nbsp; Análisis</button><button data-page-target="swaps">⇄ &nbsp; Cambios</button>
-    </nav></div>
-    <div class="spacer"></div><div class="trust"><b>Transparencia</b>Este es un ejemplo visual. El análisis real mostraría parche, fuente y muestra estadística.</div>
-   </aside>
-   <div class="main">
-    <header class="top"><span>Espacio de mazos &nbsp;/&nbsp; <b data-crumb>Mi mazo</b></span><span class="fresh"><i></i>Vista de ejemplo</span><button class="btn" data-install hidden>Instalar</button></header>
-    <main>
-     <section class="page" data-page="analysis" hidden>
- <div class="head"><div><p class="eyebrow">Análisis del mazo</p><h1>Mi mazo</h1><p class="sub">Tu guía se construirá a partir de las cartas que añadas.</p></div><span class="pill demo">Borrador · <span data-count>0/12</span></span></div>
- <div class="builder-board surface"><div class="section-title"><div><h2>Cartas del mazo</h2><p class="sub">Pulsa cualquier hueco para añadir o cambiar una carta.</p></div><button class="btn" data-page-target="add">Editar mazo</button></div><div class="slot-grid" data-slot-grid><button type="button" class="slot" data-slot="0" aria-label="Añadir carta al hueco 1"><span class="slot-index">01</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="1" aria-label="Añadir carta al hueco 2"><span class="slot-index">02</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="2" aria-label="Añadir carta al hueco 3"><span class="slot-index">03</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="3" aria-label="Añadir carta al hueco 4"><span class="slot-index">04</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="4" aria-label="Añadir carta al hueco 5"><span class="slot-index">05</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="5" aria-label="Añadir carta al hueco 6"><span class="slot-index">06</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="6" aria-label="Añadir carta al hueco 7"><span class="slot-index">07</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="7" aria-label="Añadir carta al hueco 8"><span class="slot-index">08</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="8" aria-label="Añadir carta al hueco 9"><span class="slot-index">09</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="9" aria-label="Añadir carta al hueco 10"><span class="slot-index">10</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="10" aria-label="Añadir carta al hueco 11"><span class="slot-index">11</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="11" aria-label="Añadir carta al hueco 12"><span class="slot-index">12</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button></div></div>
- <div class="analysis-right analysis-empty"><section class="surface readout"><p class="eyebrow">Próximo paso</p><h2>Añade cartas para generar tu guía de juego.</h2><p>Cuando el mazo esté completo, aquí aparecerán la curva, las sinergias, el plan por turnos y los cambios compatibles con tu colección.</p></section><div class="lower"><section class="surface insight"><h2>Sinergias</h2><p class="sub">Se detectarán entre las cartas que hayas añadido.</p></section><section class="surface insight locations"><h2>Ubicaciones</h2><p class="sub">Verás cómo adaptar el plan a cada ubicación.</p></section></div></div>
-</section>
-     <section class="page" data-page="decks" hidden><div class="head"><div><p class="eyebrow">Tu biblioteca</p><h1>Mis mazos</h1><p class="sub">Crea listas y vuelve a editarlas cuando quieras.</p></div><button class="btn primary" data-page-target="add">＋ Nuevo mazo</button></div><div class="list"><article class="surface row"><div class="row-main"><span class="thumb">S</span><div><h2>Mi mazo</h2><p><span data-count>0/12</span> cartas · guardado en este dispositivo</p></div></div><span class="pill demo">Borrador</span><button class="btn" data-page-target="add">Abrir constructor</button></article></div></section>
-     <section class="page" data-page="add"><div class="head"><div><p class="eyebrow">Constructor</p><h1>Construye tu mazo</h1><p class="sub">Tienes 12 huecos. Pulsa uno para elegir o escribir una carta.</p></div><span class="pill demo"><span data-count>0/12</span> cartas</span></div>
- <div class="builder-board surface"><div class="section-title"><div><h2>Tu lista</h2><p class="sub">Los cambios se guardan en este dispositivo.</p></div><button class="btn btn-quiet" data-clear-deck>Vaciar todo</button></div><div class="slot-grid" data-slot-grid><button type="button" class="slot" data-slot="0" aria-label="Añadir carta al hueco 1"><span class="slot-index">01</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="1" aria-label="Añadir carta al hueco 2"><span class="slot-index">02</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="2" aria-label="Añadir carta al hueco 3"><span class="slot-index">03</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="3" aria-label="Añadir carta al hueco 4"><span class="slot-index">04</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="4" aria-label="Añadir carta al hueco 5"><span class="slot-index">05</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="5" aria-label="Añadir carta al hueco 6"><span class="slot-index">06</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="6" aria-label="Añadir carta al hueco 7"><span class="slot-index">07</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="7" aria-label="Añadir carta al hueco 8"><span class="slot-index">08</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="8" aria-label="Añadir carta al hueco 9"><span class="slot-index">09</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="9" aria-label="Añadir carta al hueco 10"><span class="slot-index">10</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="10" aria-label="Añadir carta al hueco 11"><span class="slot-index">11</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button>
-<button type="button" class="slot" data-slot="11" aria-label="Añadir carta al hueco 12"><span class="slot-index">12</span><span class="slot-symbol">＋</span><span class="slot-name">Elegir carta</span></button></div><div class="builder-footer"><span class="sub" data-builder-status aria-live="polite">Empieza por cualquier hueco.</span><button class="btn primary" data-page-target="analysis">Ver análisis</button></div></div>
-</section>
-     <section class="page" data-page="swaps" hidden><div class="head"><div><p class="eyebrow">Mejoras</p><h1>Cambios recomendados</h1><p class="sub">Las sugerencias tendrán en cuenta tu mazo, tu colección y los datos del meta.</p></div><span class="pill demo">Aún sin analizar</span></div><section class="surface empty-state"><span class="empty-mark">⇄</span><h2>Completa tu mazo para ver sugerencias</h2><p class="sub">Cada recomendación explicará qué sinergia ganas, qué pierdes y si ya tienes la carta.</p><button class="btn primary" data-page-target="add">Ir al constructor</button></section></section>
-<div class="modal-scrim" data-picker hidden><section class="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title"><div class="section-title"><div><p class="eyebrow">Constructor</p><h2 id="picker-title">Añadir carta</h2></div><button class="modal-x" type="button" data-close-picker aria-label="Cerrar">×</button></div><label class="label">Nombre de la carta<input type="text" maxlength="48" data-card-name placeholder="Escribe el nombre" autocomplete="off"></label><div class="suggestions-label">Sugerencias</div><div class="suggestions"><button type="button" data-suggestion="Deadpool">Deadpool</button><button type="button" data-suggestion="Carnage">Carnage</button><button type="button" data-suggestion="Venom">Venom</button><button type="button" data-suggestion="Knull">Knull</button><button type="button" data-suggestion="Death">Death</button><button type="button" data-suggestion="Nico Minoru">Nico Minoru</button><button type="button" data-suggestion="Hulkbuster">Hulkbuster</button><button type="button" data-suggestion="Arnim Zola">Arnim Zola</button></div><p class="hint">Puedes escribir cualquier nombre; la búsqueda de la colección completa se conectará después.</p><div class="picker-actions"><button class="btn btn-quiet" type="button" data-remove-slot>Vaciar hueco</button><button class="btn" type="button" data-close-picker>Cancelar</button><button class="btn primary" type="button" data-save-slot>Guardar carta</button></div></section></div>
-    </main>
-   </div>
-  </div></div>
-<script>
-(() => {
- const root=document.getElementById("snap-coach"); if(!root)return;
- const key="snap-valley-deck-v1";let deck=Array(12).fill("");let activeSlot=null;
- try{const saved=JSON.parse(localStorage.getItem(key)||"[]");if(Array.isArray(saved))deck=Array.from({length:12},(_,i)=>typeof saved[i]==="string"?saved[i]:"")}catch{}
- const picker=root.querySelector("[data-picker]"),field=root.querySelector("[data-card-name]"),install=root.querySelector("[data-install]");
- function render(){root.querySelectorAll("[data-slot]").forEach(button=>{const i=Number(button.getAttribute("data-slot")),name=deck[i]||"";button.classList.toggle("filled",!!name);button.setAttribute("aria-label",name?"Editar "+name+", hueco "+(i+1):"Añadir carta al hueco "+(i+1));const ix=document.createElement("span");ix.className="slot-index";ix.textContent=String(i+1).padStart(2,"0");const symbol=document.createElement("span");symbol.className="slot-symbol";symbol.textContent=name?"✓":"＋";const label=document.createElement("span");label.className="slot-name";label.textContent=name||"Elegir carta";button.replaceChildren(ix,symbol,label)});const count=deck.filter(Boolean).length;root.querySelectorAll("[data-count]").forEach(node=>node.textContent=count+"/12")}
- function save(){try{localStorage.setItem(key,JSON.stringify(deck))}catch{}render()}
- function go(app,page){app.querySelectorAll("[data-page]").forEach(x=>x.hidden=x.getAttribute("data-page")!==page);app.querySelectorAll("[data-page-target]").forEach(x=>{if(x.getAttribute("data-page-target")===page)x.setAttribute("aria-current","page");else x.removeAttribute("aria-current")});const c=app.querySelector("[data-crumb]");if(c)c.textContent=({decks:"Mis mazos",add:"Constructor",analysis:"Análisis",swaps:"Cambios"})[page]||"Snap Valley"}
- function closePicker(){picker.hidden=true;activeSlot=null}
- root.addEventListener("click",e=>{const nav=e.target.closest("[data-page-target]");if(nav&&root.contains(nav)){const app=nav.closest(".app");if(app)go(app,nav.getAttribute("data-page-target"));return}
-  const slot=e.target.closest("[data-slot]");if(slot&&root.contains(slot)){activeSlot=Number(slot.getAttribute("data-slot"));field.value=deck[activeSlot]||"";picker.hidden=false;field.focus();return}
-  const suggestion=e.target.closest("[data-suggestion]");if(suggestion){field.value=suggestion.getAttribute("data-suggestion");field.focus();return}
-  if(e.target.closest("[data-save-slot]")){const value=field.value.trim().slice(0,48);if(value&&activeSlot!==null){deck[activeSlot]=value;save();const status=root.querySelector("[data-builder-status]");if(status)status.textContent=value+" añadida al hueco "+(activeSlot+1)+".";closePicker()}return}
-  if(e.target.closest("[data-remove-slot]")){if(activeSlot!==null){deck[activeSlot]="";save()}closePicker();return}
-  if(e.target.closest("[data-close-picker]")||e.target===picker){closePicker();return}
-  if(e.target.closest("[data-clear-deck]")){deck=Array(12).fill("");save();const status=root.querySelector("[data-builder-status]");if(status)status.textContent="Los 12 huecos están vacíos.";return}
-  const t=e.target.closest("[data-plan-target]");if(t){const app=t.closest(".app"),copy=app.querySelector("[data-plan-copy]");app.querySelectorAll("[data-plan-target]").forEach(b=>b.setAttribute("aria-pressed",String(b===t)));copy.innerHTML=({opening:"<strong>Preparar:</strong> identifica tu combinación principal y conserva opciones para responder a la ubicación.",build:"<strong>Desarrollar:</strong> organiza las cartas por función y prepara más de una ruta de cierre.",close:"<strong>Cerrar:</strong> compara tus opciones finales según la energía, el espacio y la mesa."})[t.getAttribute("data-plan-target")];return}
- });
- document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!picker.hidden)closePicker()});
- window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();window.snapInstallPrompt=event;if(install)install.hidden=false});
- if(install)install.addEventListener("click",async()=>{const prompt=window.snapInstallPrompt;if(!prompt)return;prompt.prompt();await prompt.userChoice;window.snapInstallPrompt=null;install.hidden=true});
- window.addEventListener("appinstalled",()=>{if(install)install.hidden=true});
- if("serviceWorker" in navigator&&location.protocol!=="file:")navigator.serviceWorker.register("./sw.js").catch(()=>{});
- render();
-})();
-</script>
-<style>
-#snap-coach{color-scheme:dark;--bg:#0b100e;--shell:#111714;--panel:#171f1b;--soft:#202a25;--line:#304139;--ink:#eef8ef;--dim:#9db0a3;--hot:#a9ff35;--hotbg:#1b2b16;--mint:#b5ff62;--mintbg:#23371b;--violet:#c5a8ff;--violetbg:#302b44;background:var(--bg)}
-#snap-coach .brand{color:var(--hot)}#snap-coach .mark{background:var(--hot);color:#10170b}#snap-coach .primary{border-color:var(--hot);background:var(--hot);color:#10170b}#snap-coach .eyebrow,#snap-coach .nav button[aria-current=page]{color:var(--hot)}#snap-coach .nav button[aria-current=page]{background:var(--hotbg)}
-#snap-coach .slot-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
-#snap-coach .slot{display:flex;position:relative;min-width:0;aspect-ratio:.76;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:12px;border:1px dashed #5b7950;border-radius:14px;background:linear-gradient(145deg,#151d19,#101512);color:var(--dim);cursor:pointer;font:inherit;text-align:center;transition:border-color .15s ease,background .15s ease,transform .15s ease}
-#snap-coach .slot:hover{border-color:var(--hot);background:#17231b;transform:translateY(-2px)}#snap-coach .slot.filled{border-style:solid;border-color:#678d4e;background:linear-gradient(145deg,#253426,#131b16);color:var(--ink)}
-#snap-coach .slot-index{position:absolute;top:9px;left:10px;color:var(--hot);font-size:10px;font-weight:700;letter-spacing:.08em}#snap-coach .slot-symbol{display:grid;width:39px;height:39px;place-items:center;border:1px solid #52694c;border-radius:50%;color:var(--hot);font-size:20px}#snap-coach .slot.filled .slot-symbol{border-color:var(--hot);background:#a9ff3518;font-size:12px}
-#snap-coach .slot-name{max-width:100%;overflow-wrap:anywhere;color:var(--ink);font-size:12px;font-weight:600}#snap-coach .slot:not(.filled) .slot-name{color:var(--dim);font-size:10px;font-weight:500}
-#snap-coach .builder-board{padding:16px}.builder-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
-#snap-coach .analysis-empty{margin-top:14px}.analysis-empty .lower{margin-top:10px}.analysis-empty .insight p{margin:8px 0 0}
-#snap-coach .empty-state{display:grid;justify-items:center;gap:10px;padding:42px 18px;text-align:center}.empty-state p{max-width:44ch;margin:0 0 6px}.empty-mark{display:grid;width:44px;height:44px;place-items:center;border:1px solid #577445;border-radius:14px;background:var(--hotbg);color:var(--hot);font-size:22px}
-#snap-coach .modal-scrim{position:fixed;inset:0;z-index:10;display:grid;place-items:center;padding:18px;background:#000b;backdrop-filter:blur(8px)}#snap-coach .picker{width:min(480px,100%);padding:20px;border:1px solid var(--line);border-radius:18px;background:#151d19;box-shadow:0 24px 90px #0009}
-#snap-coach .modal-x{width:34px;height:34px;border:1px solid var(--line);border-radius:9px;background:var(--soft);color:var(--ink);cursor:pointer;font:inherit;font-size:20px}
-#snap-coach .picker input{display:block;width:100%;min-height:44px;margin-top:7px;padding:0 12px;border:1px solid #425348;border-radius:9px;background:#0d1310;color:var(--ink);font:inherit;font-size:16px}
-#snap-coach .suggestions-label{margin:14px 0 8px;color:var(--dim);font-size:10px}.suggestions{display:flex;flex-wrap:wrap;gap:7px}.suggestions button{min-height:34px;padding:0 10px;border:1px solid var(--line);border-radius:9px;background:var(--soft);color:var(--ink);cursor:pointer;font:inherit;font-size:10px}.suggestions button:hover{border-color:var(--hot);color:var(--hot)}
-#snap-coach .picker-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:18px;padding-top:13px;border-top:1px solid var(--line)}#snap-coach .top{background:var(--shell)}
-@media(max-width:760px){#snap-coach .slot-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}#snap-coach .slot{border-radius:12px;padding:8px}#snap-coach .slot-name{font-size:10px}.builder-board{padding:11px!important}.builder-footer{align-items:flex-start}.builder-footer .sub{max-width:55%}}
-@media(max-width:380px){#snap-coach .slot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#snap-coach .slot{aspect-ratio:.85}}
-</style>
+<div class="app" id="snap-valley">
+ <aside class="side">
+  <div class="brand"><span class="brand-mark">S</span><span>SNAP VALLEY<small>DECK LAB</small></span></div>
+  <p class="nav-title">Tu espacio</p>
+  <nav class="nav" aria-label="Secciones">
+   <button type="button" data-page-target="analysis" aria-current="page"><span class="nav-icon">✳</span>Análisis</button>
+   <button type="button" data-page-target="builder"><span class="nav-icon">▦</span>Mi mazo</button>
+   <button type="button" data-page-target="complete"><span class="nav-icon">⌕</span>Completar</button>
+  </nav>
+  <div class="side-bottom"><strong>Datos en tu dispositivo</strong><p>Tu mazo se guarda en este teléfono o navegador. Snap Valley no pide cuenta ni envía tu colección.</p></div>
+ </aside>
+ <div class="main">
+  <header class="top"><span class="crumb">Snap Valley &nbsp;›&nbsp; <b data-crumb>Análisis</b></span><div class="top-right"><span class="updated"><i></i><span data-catalog-status>Preparando catálogo…</span></span><button class="btn small" data-install hidden>Instalar app</button></div></header>
+  <main>
+   <section class="page" data-page="analysis">
+    <div class="hero"><div><p class="eyebrow">La jugada empieza antes de robar</p><h1>Analiza tu mazo</h1><p class="sub">Snap Valley mira la curva, detecta el plan y te muestra una línea por turnos suponiendo que robas tus cartas clave.</p></div><button class="btn primary" data-page-target="builder">Editar las 12 cartas <span data-deck-count>0/12</span></button></div>
+    <div class="surface panel">
+     <div class="section-head"><div><h2>Tu mazo</h2><p class="sub">Las cartas se quedan guardadas en este dispositivo.</p></div><button class="btn small" data-page-target="builder">Cambiar mazo</button></div>
+     <div class="deck-mini" data-analysis-deck><div class="empty-analysis" style="width:100%;min-height:92px"><div><strong>Empieza añadiendo cartas</strong><p>Rellena al menos dos huecos para ver las primeras sinergias. Con las 12 cartas aparecerán las probabilidades de robo y el plan completo.</p></div></div></div>
+    </div>
+    <div class="kpis">
+     <article class="surface kpi"><span>Plan detectado</span><strong data-archetype>—</strong><small data-archetype-note>Añade cartas para identificarlo</small></article>
+     <article class="surface kpi"><span>Coste medio</span><strong data-average>—</strong><small data-average-note>Sobre cartas reconocidas</small></article>
+     <article class="surface kpi"><span>Cartas baratas · 1–3</span><strong data-low-curve>—</strong><small>Preparan los primeros turnos</small></article>
+     <article class="surface kpi"><span>Condición de victoria</span><strong data-win-condition>—</strong><small data-win-note>Se explica con tu lista</small></article>
+    </div>
+    <div class="analysis-grid">
+     <div class="analysis-main">
+      <section class="surface panel"><div class="section-head"><div><h2>Curva de energía</h2><p class="sub">Cuántas cartas tienes disponibles en cada coste.</p></div><span class="pill" data-curve-status>0 cartas</span></div><div class="curve" data-curve></div></section>
+      <section class="surface panel"><div class="section-head"><div><h2>Línea ideal por turnos</h2><p class="sub">La secuencia que mejor aprovecha tu energía y las sinergias detectadas.</p></div><span class="pill green">Supone que robas la opción</span></div><div class="plan" data-turn-plan><div class="empty-analysis"><div><strong>Sin cartas que ordenar todavía</strong><p>Al añadir cartas te diré qué priorizar en cada turno y qué alternativa usar si no aparece la carta clave.</p></div></div></div><p class="catalog-note">Es una guía condicional: no simula la mano real, las ubicaciones, los movimientos del rival ni cambios de coste específicos de cada partida.</p></section>
+      <section class="surface panel"><div class="section-head"><div><h2>Qué probaría cambiar</h2><p class="sub">Sustituciones del mismo coste que refuerzan las sinergias de tu lista.</p></div></div><div class="swaps-list" data-swaps><div class="empty-analysis" style="min-height:90px"><p>Completa varias cartas para comparar alternativas.</p></div></div></section>
+     </div>
+     <div class="analysis-aside">
+      <section class="surface panel"><div class="section-head"><div><h2>¿Robas tus piezas clave?</h2><p class="sub">Probabilidad matemática en un mazo de 12 cartas, sin robos extra.</p></div></div>
+       <div class="prob-options"><select class="field" data-starting-hand aria-label="Cartas iniciales"><option value="3">Empiezo con 3 cartas</option><option value="4">Empiezo con 4 cartas</option></select><select class="field" data-game-length aria-label="Duración de la partida"><option value="6">Partida de 6 turnos</option><option value="7">Partida de 7 turnos</option></select></div><div class="prob-list" data-probabilities><div class="empty-analysis" style="min-height:90px"><p>Se calcula al completar las 12 cartas.</p></div></div>
+      </section>
+      <section class="surface panel"><div class="section-head"><div><h2>Sinergias detectadas</h2><p class="sub">Combos reconocidos y qué función cumple cada pieza.</p></div></div><div class="synergy-list" data-synergies><div class="empty-analysis" style="min-height:90px"><p>Aún no hay combinaciones que analizar.</p></div></div></section>
+      <section class="surface panel"><div class="section-head"><div><h2>Comprueba una ubicación</h2><p class="sub">Busca cómo puede interactuar con el plan de tu mazo.</p></div></div><input class="location-search" data-location-search type="search" placeholder="Buscar ubicación…" autocomplete="off"><div class="location-results" data-location-results></div><div data-location-detail></div></section>
+      <section class="surface panel meta-panel"><div class="source-box"><strong>Parche y meta actual</strong><p>El catálogo incluye las cartas liberadas a 21 oct 2026. Las tasas competitivas cambian con cada parche; Snap Valley explica sus recomendaciones por curva y sinergia y enlaza los datos vivos para que puedas comprobar muestra y rango.</p><div class="links"><a class="text-link" href="https://snap.fan/cards/" target="_blank" rel="noreferrer">Fuente de cartas ↗</a><a class="text-link" href="https://snap.fan/locations/" target="_blank" rel="noreferrer">Fuente de ubicaciones ↗</a><a class="text-link" href="https://marvelsnap.com/patch-notes-october-20-2026/" target="_blank" rel="noreferrer">Notas oficiales del parche ↗</a><a class="text-link" href="https://marvelsnapzone.com/meta/" target="_blank" rel="noreferrer">Estadísticas del meta ↗</a></div></div></section>
+     </div>
+    </div>
+   </section>
+
+   <section class="page" data-page="builder" hidden>
+    <div class="hero"><div><p class="eyebrow">Constructor</p><h1>Tu mazo, carta por carta</h1><p class="sub">Pulsa un hueco y busca entre más de 500 cartas jugables con sus costes, poderes y habilidades.</p></div><span class="pill green"><span data-deck-count>0/12</span> cartas</span></div>
+    <section class="surface builder-board"><div class="section-head"><div><h2>Lista de 12</h2><p class="sub">No necesitas completar el mazo para empezar el análisis.</p></div><button class="btn quiet small" data-clear-deck>Vaciar</button></div><div class="slots" data-slots></div><div class="builder-bottom"><span class="status" data-builder-status aria-live="polite">Añade tus cartas y vuelve a análisis.</span><button class="btn primary" data-page-target="analysis">Analizar mi mazo →</button></div></section>
+   </section>
+
+   <section class="page" data-page="complete" hidden>
+    <div class="hero"><div><p class="eyebrow">Creador por sinergias</p><h1>Completa tu mazo</h1><p class="sub">Elige de 2 a 11 cartas. Snap Valley conserva tus elecciones y recomienda el resto para llegar a 12.</p></div><span class="pill green"><span data-seed-count>0</span>/11 elegidas</span></div>
+    <div class="complete-layout">
+     <section class="surface complete-controls">
+      <h2>Empieza por tus cartas</h2><p class="sub">Puedes buscar tus piezas favoritas, una condición de victoria o un paquete que quieras probar.</p>
+      <input class="search" data-seed-search type="search" placeholder="Busca una carta por nombre o habilidad…" autocomplete="off">
+      <div class="matches" data-seed-matches></div>
+      <div class="section-head" style="margin:15px 0 0"><h3>Tus elecciones</h3><button class="btn quiet small" data-clear-seeds>Limpiar</button></div>
+      <div class="seed-pills" data-seed-pills><span class="muted">Elige al menos dos.</span></div>
+      <button class="btn primary" style="width:100%;margin-top:15px" data-run-recommend disabled>Completar con sinergias →</button>
+      <p class="catalog-note">La selección admite hasta 11 cartas. La recomendación prioriza combos reconocidos, costes que faltan y poder por energía. No presenta estadísticas de victoria como si fueran propias.</p>
+     </section>
+     <section class="surface complete-result" data-recommendation><div class="empty-analysis"><div><strong>Tu recomendación aparecerá aquí</strong><p>Prueba, por ejemplo, con Deadpool y Carnage, o elige tus propias cartas. Te explicaré por qué entra cada recomendación.</p></div></div></section>
+    </div>
+   </section>
+  </main>
+ </div>
+</div>
+
+<div class="picker-scrim" data-picker hidden>
+ <section class="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title">
+  <div class="picker-top"><div><p class="eyebrow">Base de cartas</p><h2 id="picker-title">Añade una carta al mazo</h2></div><button type="button" class="modal-close" data-picker-close aria-label="Cerrar">×</button></div>
+  <input class="search" data-picker-search type="search" placeholder="Nombre o texto de habilidad…" autocomplete="off">
+  <div class="prob-options" style="margin-top:9px"><select class="field" data-cost-filter aria-label="Filtrar por coste"><option value="all">Todos los costes</option><option value="0">0 de energía</option><option value="1">1 de energía</option><option value="2">2 de energía</option><option value="3">3 de energía</option><option value="4">4 de energía</option><option value="5">5 de energía</option><option value="6">6+ de energía</option></select><span class="pill" data-picker-count></span></div>
+  <div class="picker-body" data-picker-results></div>
+ </section>
+</div>
+<div data-toast hidden class="toast" role="status"></div>
+<script src="./cards.js"></script>
+<script src="./locations.js"></script>
+<script src="./app.js"></script>
 </body>
 </html>
-
-
-
