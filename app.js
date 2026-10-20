@@ -55,11 +55,17 @@
   zoo:["Ultron","Gilgamesh","Ka-Zar","Mockingbird"],
   ramp:["Arishem","Blob","Doctor Doom","The Infinaut"]
  };
+ const finishKeys={
+  destroy:["Knull","Death","Nimrod","Arnim Zola","Taskmaster"],discard:["Apocalypse","Hela"],move:["Heimdall"],bounce:["Hit-Monkey"],
+  ongoing:["Onslaught","Living Tribunal","Iron Man"],reveal:["Odin","Black Panther","Doctor Doom"],negative:["Gorr","Iron Man","Sage"],
+  afflict:["Ajax","Man-Thing","Cassandra Nova"],zoo:["Ultron","Gilgamesh","Ka-Zar"],ramp:["Blob","Doctor Doom","The Infinaut"]
+ };
  const targetCurve={0:1,1:2,2:3,3:3,4:2,5:1,6:1};
 
  function norm(value){return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()}
  function esc(value){return String(value===undefined||value===null?"":value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]))}
  function cardForName(name){return cardByName.get(norm(name))}
+ function rankSearchResults(items,query){if(!query)return items;const rank=card=>{const name=norm(card.name);return name===query?0:name.startsWith(query)?1:2};return items.sort((a,b)=>rank(a)-rank(b)||norm(a.name).length-norm(b.name).length)}
  function storeDeck(){try{localStorage.setItem(deckKey,JSON.stringify(deck))}catch{}}
  function showToast(message){const box=app.querySelector("[data-toast]");box.textContent=message;box.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>box.hidden=true,2400)}
  function cardTags(card){
@@ -109,21 +115,67 @@
   if(/draw|copy|double|destroy|discard|move|create|add|steal|revive|resurrect|reduce|energy/.test(text))bonus+=.65;
   return card.power*.58+bonus+cardTags(card).size*.18
  }
- function bestTurnSubset(remaining,energy,alreadyPlayed){
+ function isDestroyEffect(card){
+  if(!card||norm(card.name)==="death")return false;
+  return /destroy (your|all|each|a |the|one|cards|any)/.test(norm(card.ability))
+ }
+ function deathDiscountEstimate(played){return Math.min(8,(played||[]).filter(isDestroyEffect).length)}
+ function plannedCost(card,played){
+  const discount=norm(card.name)==="death"?deathDiscountEstimate(played):0;
+  return {cost:Math.max(0,card.cost-discount),discount}
+ }
+ function x23Bonus(played){
+  const sequence=played||[],index=sequence.findIndex(card=>norm(card.name)==="x 23");
+  return index>=0&&sequence.slice(index+1).some(isDestroyEffect)?1:0
+ }
+ function turnTimingUtility(card,turn,turnLength,main){
+  const finisher=(finishKeys[main]||[]).some(name=>norm(name)===norm(card.name));
+  let score=card.cost>=5&&turn<turnLength-1?-1.2:0;
+  if(finisher)score+=turn>=turnLength-1?2.8:-.7;
+  return score
+ }
+ function bestTurnSubset(remaining,energy,alreadyPlayed,turn,turnLength,main){
   let best={cards:[],score:-Infinity,spent:0};
   for(let mask=1;mask<(1<<remaining.length);mask++){
    let subset=[],spent=0,power=0;
-   for(let i=0;i<remaining.length;i++)if(mask&(1<<i)){const card=remaining[i];spent+=Math.max(0,card.cost);if(spent>energy)break;subset.push(card);power+=cardUtility(card)}
+   for(let i=0;i<remaining.length;i++)if(mask&(1<<i)){const card=remaining[i];spent+=plannedCost(card,alreadyPlayed).cost;if(spent>energy)break;subset.push(card);power+=cardUtility(card)+turnTimingUtility(card,turn,turnLength,main)}
    if(spent>energy||!subset.length)continue;
-   const pool=[...alreadyPlayed,...subset];let links=0;
-   for(let i=0;i<subset.length;i++)for(let j=i+1;j<pool.length;j++)if(pool[j]!==subset[i]&&pairMatches(subset[i],pool[j]))links++;
+   let links=0;
+   for(let i=0;i<subset.length;i++){
+    for(const other of alreadyPlayed)if(pairMatches(subset[i],other))links++;
+    for(let j=i+1;j<subset.length;j++)if(pairMatches(subset[i],subset[j]))links++
+   }
    const score=spent*1.12+power+links*2.1-Math.max(0,energy-spent)*.62;
    if(score>best.score)best={cards:subset,score,spent}
   }
   return best
  }
+ function specialLineAdvice(cards,played){
+  const all=[...played,...cards],find=name=>all.find(card=>norm(card.name)===norm(name)),current=name=>cards.find(card=>norm(card.name)===norm(name));
+  const destroyer=cards.find(isDestroyEffect);
+  if(!destroyer)return "";
+  const deadpool=find("Deadpool");
+  if(deadpool)return current("Deadpool")?"Juega primero a Deadpool y después a "+destroyer.name+" en la misma ubicación. Si se destruye, vuelve a tu mano con el poder duplicado.":"Si Deadpool sigue en mesa, coloca "+destroyer.name+" en su ubicación para destruirlo; regresará a tu mano con más poder.";
+  const x23=find("X-23");
+  if(x23)return current("X-23")?"Juega X-23 antes que "+destroyer.name+" en la misma ubicación. Si la destruye, vuelve a aparecer y te da +1 energía el turno siguiente.":"Si X-23 sigue en mesa, intenta destruirla con "+destroyer.name+"; su efecto te da +1 energía el turno siguiente.";
+  const nimrod=find("Nimrod");
+  if(nimrod)return current("Nimrod")?"Juega primero a Nimrod y luego a "+destroyer.name+". Al destruirlo, Nimrod añade copias en las otras ubicaciones.":"Si Nimrod sigue en mesa, destrúyelo con "+destroyer.name+" para repartir copias por las otras ubicaciones.";
+  const bucky=find("Bucky Barnes");
+  if(bucky)return current("Bucky Barnes")?"Juega primero a Bucky Barnes y después a "+destroyer.name+" en su ubicación para cambiarlo por Winter Soldier.":"Si Bucky sigue en mesa, destrúyelo con "+destroyer.name+" para dejar Winter Soldier en su lugar.";
+  return "Secuencia de destrucción: primero deja en mesa la carta que quieres destruir; después juega "+destroyer.name+" en esa misma ubicación. Revisa qué objetivos hay allí antes de resolverlo."
+ }
+ function orderTurnCards(cards){
+  const targets=new Set(["deadpool","x 23","nimrod","bucky barnes","nova","wolverine"]);
+  if(!cards.some(isDestroyEffect))return cards;
+  return [...cards].sort((a,b)=>{
+   const rank=card=>targets.has(norm(card.name))?0:isDestroyEffect(card)?2:1;
+   return rank(a)-rank(b)
+  })
+ }
  function turnAdvice(turn,cards,spent,played){
   if(!cards.length)return "Guarda la energía si no tienes una jugada que avance tu plan.";
+  const special=specialLineAdvice(cards,played);
+  if(special)return special+(spent<turn?" Te sobran "+(turn-spent)+" de energía; completa con una carta barata solo si no estropea el combo.":"");
   let card=cards.find(item=>played.some(other=>pairMatches(item,other))||cards.some(other=>other!==item&&pairMatches(item,other)));
   if(card){
    let partner=played.find(other=>pairMatches(card,other))||cards.find(other=>other!==card&&pairMatches(card,other));
@@ -132,12 +184,13 @@
   return spent===turn?"Curva limpia: gastas toda la energía; conserva el espacio de ubicación para tu siguiente pieza.":"Juega "+cards.map(item=>item.name).join(" + ")+", gastas "+spent+" de "+turn+" y mantienes una alternativa para el turno siguiente."
  }
  function buildTurnPlan(list,turnLength){
-  const remaining=[...list],played=[],turns=[];
+  const remaining=[...list],played=[],turns=[],main=profile(list).main;
   for(let turn=1;turn<=turnLength;turn++){
-   const choice=bestTurnSubset(remaining,turn,played);
-   choice.cards.forEach(card=>{const index=remaining.findIndex(item=>item.id===card.id);if(index>=0)remaining.splice(index,1)});
-   turns.push({turn,cards:choice.cards,spent:choice.spent,playedBefore:[...played],note:turnAdvice(turn,choice.cards,choice.spent,played)});
-   played.push(...choice.cards)
+   const bonus=x23Bonus(played),energy=turn+bonus,choice=bestTurnSubset(remaining,energy,played,turn,turnLength,main);
+   const ordered=orderTurnCards(choice.cards),costs=Object.fromEntries(ordered.map(card=>[card.id,plannedCost(card,played)]));
+   ordered.forEach(card=>{const index=remaining.findIndex(item=>item.id===card.id);if(index>=0)remaining.splice(index,1)});
+   turns.push({turn,energy,bonus,cards:ordered,costs,spent:choice.spent,playedBefore:[...played],note:turnAdvice(turn,ordered,choice.spent,played)});
+   played.push(...ordered)
   }
   return turns
  }
@@ -172,9 +225,15 @@
   if(list.length<2){target.innerHTML='<div class="empty-analysis"><div><strong>Añade dos o más cartas</strong><p>Podré priorizar una curva y escribir opciones por turnos. Con menos cartas no hay información suficiente.</p></div></div>';return}
   const turns=buildTurnPlan(list,Number(app.querySelector("[data-game-length]").value));
   target.innerHTML=turns.map(row=>{
-   const cardsHtml=row.cards.length?'<div class="turn-cards">'+row.cards.map(card=>'<span class="turn-card"><b>'+card.cost+'</b> '+esc(card.name)+' <span class="muted">· '+card.power+'</span></span>').join("")+'</div>':'<span class="muted">Sin jugada propuesta</span>';
-   return '<article class="turn"><div class="turn-label">TURNO '+row.turn+'<small>'+row.spent+'/'+row.turn+' energía</small></div><div class="turn-content">'+cardsHtml+'<div class="turn-note">'+esc(row.note)+'</div></div></article>'
-  }).join("")
+   const cardsHtml=row.cards.length?'<div class="turn-cards">'+row.cards.map(card=>{const detail=row.costs[card.id],costLabel=detail.discount?card.cost+'→'+detail.cost+'*':detail.cost;return '<span class="turn-card"><b>'+costLabel+'</b> '+esc(card.name)+' <span class="muted">· '+card.power+'</span></span>'}).join("")+'</div>':'<span class="muted">Sin jugada propuesta</span>';
+   const energyLabel=row.spent+'/'+row.turn+' energía'+(row.bonus?' (hasta '+row.energy+' si se activa X-23)':'');
+   return '<article class="turn"><div class="turn-label">TURNO '+row.turn+'<small>'+energyLabel+'</small></div><div class="turn-content">'+cardsHtml+'<div class="turn-note">'+esc(row.note)+'</div></div></article>'
+  }).join("");
+  const deathRows=turns.flatMap(row=>row.cards.filter(card=>row.costs[card.id].discount).map(card=>({card,...row.costs[card.id]})));
+  const notes=[];
+  if(deathRows.length){const item=deathRows[0];notes.push('* Death: '+item.discount+' descuentos estimados por las cartas destructoras jugadas antes. Solo cuenta si realmente destruyeron al menos '+item.discount+' cartas; su coste base es '+item.card.cost+'.')}
+  if(turns.some(row=>row.bonus))notes.push('X-23: el +1 de energía depende de que se destruya después de entrar. La línea supone que se activa; si no, quédate con la energía base del turno.');
+  if(notes.length)target.innerHTML+='<div class="catalog-note">'+notes.map(esc).join('<br>')+'</div>'
  }
  function renderProbabilities(list,main){
   const target=app.querySelector("[data-probabilities]");
@@ -297,10 +356,10 @@
  function renderPicker(){
   const query=norm(app.querySelector("[data-picker-search]").value),costFilter=app.querySelector("[data-cost-filter]").value;
   const used=new Set(deck.map(cardForName).filter(Boolean).map(card=>card.id));
-  let matching=cards.filter(card=>{
+  let matching=rankSearchResults(cards.filter(card=>{
    const found=!query||norm(card.name+" "+card.ability).includes(query),cost=costFilter==="6"?card.cost>=6:costFilter==="all"||card.cost===Number(costFilter);
    return found&&cost
-  });
+  }),query);
   const total=matching.length;matching=matching.slice(0,60);
   app.querySelector("[data-picker-count]").textContent=Math.min(60,total)+" de "+total;
   app.querySelector("[data-picker-results]").innerHTML=matching.map(card=>{
@@ -319,7 +378,7 @@
  function renderSeedMatches(){
   const target=app.querySelector("[data-seed-matches]"),query=norm(app.querySelector("[data-seed-search]").value);
   if(!query){target.innerHTML="";return}
-  const matching=cards.filter(card=>!seeds.includes(card.id)&&norm(card.name+" "+card.ability).includes(query)).slice(0,20);
+  const matching=rankSearchResults(cards.filter(card=>!seeds.includes(card.id)&&norm(card.name+" "+card.ability).includes(query)),query).slice(0,20);
   target.innerHTML=matching.map(card=>'<button type="button" class="match-result" data-seed-choice="'+esc(card.id)+'" '+(seeds.length>=11?"disabled":"")+'><b>'+esc(card.name)+' · '+card.cost+' energía · '+card.power+' poder</b><small>'+esc(card.ability||"Sin habilidad")+'</small></button>').join("")||'<span class="muted" style="padding:8px;font-size:10px">No hay resultados.</span>'
  }
  function saveSeeds(){try{localStorage.setItem(seedKey,JSON.stringify(seeds))}catch{}}
