@@ -106,6 +106,7 @@
        <div class="prob-options"><select class="field" data-starting-hand aria-label="Cartas iniciales"><option value="3">Empiezo con 3 cartas</option><option value="4">Empiezo con 4 cartas</option></select><select class="field" data-game-length aria-label="Duración de la partida"><option value="6">Partida de 6 turnos</option><option value="7">Partida de 7 turnos</option></select></div><div class="prob-list" data-probabilities><div class="empty-analysis" style="min-height:90px"><p>Se calcula al completar las 12 cartas.</p></div></div>
       </section>
       <section class="surface panel"><div class="section-head"><div><h2>Sinergias detectadas</h2><p class="sub">Combos reconocidos y qué función cumple cada pieza.</p></div></div><div class="synergy-list" data-synergies><div class="empty-analysis" style="min-height:90px"><p>Aún no hay combinaciones que analizar.</p></div></div></section>
+      <section class="surface panel"><div class="section-head"><div><h2>Arquetipos que pueden contrarrestarlo</h2><p class="sub">Amenazas por mecánica, calculadas a partir del plan detectado.</p></div></div><div class="synergy-list" data-counters><div class="empty-analysis" style="min-height:90px"><p>Añade cartas para detectar qué respuestas rivales complican este plan.</p></div></div><p class="catalog-note">Son counters posibles por efecto de carta, no porcentajes de enfrentamiento ni un ranking del meta por rango.</p></section>
       <section class="surface panel"><div class="section-head"><div><h2>Comprueba una ubicación</h2><p class="sub">Busca cómo puede interactuar con el plan de tu mazo.</p></div></div><input class="location-search" data-location-search type="search" placeholder="Buscar ubicación…" autocomplete="off"><div class="location-results" data-location-results></div><div data-location-detail></div></section>
       <section class="surface panel meta-panel"><div class="source-box"><strong>Parche y meta actual</strong><p>El catálogo incluye las cartas liberadas a 21 oct 2026. Las tasas competitivas cambian con cada parche; Snap Valley explica sus recomendaciones por curva y sinergia y enlaza los datos vivos para que puedas comprobar muestra y rango.</p><div class="links"><a class="text-link" href="https://snap.fan/cards/" target="_blank" rel="noreferrer">Fuente de cartas ↗</a><a class="text-link" href="https://snap.fan/locations/" target="_blank" rel="noreferrer">Fuente de ubicaciones ↗</a><a class="text-link" href="https://marvelsnap.com/patch-notes-october-20-2026/" target="_blank" rel="noreferrer">Notas oficiales del parche ↗</a><a class="text-link" href="https://marvelsnapzone.com/meta/" target="_blank" rel="noreferrer">Estadísticas del meta ↗</a></div></div></section>
      </div>
@@ -134,9 +135,7 @@
    </section>
   </main>
  </div>
-</div>
-
-<div class="picker-scrim" data-picker hidden>
+ <div class="picker-scrim" data-picker hidden>
  <section class="picker" role="dialog" aria-modal="true" aria-labelledby="picker-title">
   <div class="picker-top"><div><p class="eyebrow">Base de cartas</p><h2 id="picker-title">Añade una carta al mazo</h2></div><button type="button" class="modal-close" data-picker-close aria-label="Cerrar">×</button></div>
   <input class="search" data-picker-search type="search" placeholder="Nombre o texto de habilidad…" autocomplete="off">
@@ -144,9 +143,10 @@
   <div class="picker-body" data-picker-results></div>
  </section>
 </div>
-<div data-toast hidden class="toast" role="status"></div>
+ <div data-toast hidden class="toast" role="status"></div>
+</div>
 <script src="./cards.js"></script>
 <script src="./locations.js"></script>
-<script src="./app.js?v=20261021-4"></script>
+<script src="./app.js?v=20261021-5"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-const CACHE = "snap-valley-shell-v4";
+const CACHE = "snap-valley-shell-v5";
 const CORE = ["./", "./index.html", "./app.js", "./cards.js", "./locations.js", "./manifest.webmanifest", "./icon-192.svg", "./icon-512.svg"];
 self.addEventListener("install", event => {
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE)).then(() => self.skipWaiting()));

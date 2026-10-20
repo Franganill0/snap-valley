@@ -91,6 +91,48 @@
   ongoing:["Onslaught","Living Tribunal","Iron Man"],reveal:["Odin","Black Panther","Doctor Doom"],negative:["Gorr","Iron Man","Sage"],
   afflict:["Ajax","Man-Thing","Cassandra Nova"],zoo:["Ultron","Gilgamesh","Ka-Zar"],ramp:["Blob","Doctor Doom","The Infinaut"]
  };
+ const counterGuides={
+  destroy:[
+   {name:"Control anti-destrucción",cards:["Armor","Cosmo"],reason:"Armor impide destruir cartas en su ubicación y Cosmo apaga los efectos Al revelar de Carnage, Venom o Deathlok allí. Reparte tus piezas y conserva una segunda ubicación para destruir."},
+   {name:"Control de poder",cards:["Shadow King","Shang-Chi"],reason:"Shadow King devuelve al poder original las cartas de su ubicación; Shang-Chi destruye allí las de 10 o más. Knull no cae ante Shadow King, así que no concentres toda la fuerza en una sola línea."}
+  ],
+  discard:[
+   {name:"Control de revelación",cards:["Cosmo"],reason:"Cosmo puede bloquear en su ubicación los efectos Al revelar que descartan, como Lady Sif o MODOK. El descarte sigue funcionando en otra ubicación."},
+   {name:"Control de Continuos",cards:["Enchantress","Rogue"],reason:"Pueden quitar o robar el texto de Morbius si lo alcanzan en su ubicación, reduciendo el valor de los descartes acumulados."}
+  ],
+  move:[
+   {name:"Control de ubicaciones",cards:["Storm","Professor X"],reason:"Inundar o cerrar una ubicación limita las rutas de movimiento y puede dejar tus cartas sin espacio para terminar el turno donde necesitan."},
+   {name:"Control de poder",cards:["Shadow King"],reason:"Restablece el poder de las cartas en su ubicación y puede borrar el crecimiento de Antorcha Humana, Daga o Buitre después de moverlas."}
+  ],
+  bounce:[
+   {name:"Anti-rebote / Anti-zoo",cards:["Killmonger"],reason:"Destruye todas las cartas de coste 1, castigando una mesa que depende de volver a jugar varias piezas pequeñas. Guarda un plan alternativo si sospechas que lo lleva."},
+   {name:"Control de poder",cards:["Shadow King"],reason:"Puede restablecer Angela, Bishop y otras cartas que hayan ganado poder en su ubicación. Distribuye el crecimiento entre varias líneas."}
+  ],
+  ongoing:[
+   {name:"Control anti-Continuo",cards:["Enchantress","Rogue"],reason:"Enchantress elimina las habilidades Continuas de su ubicación y Rogue roba una de ellas. No apiles todas tus fuentes de poder Continuo en la misma línea."},
+   {name:"Control de ubicaciones",cards:["Professor X","Storm"],reason:"Cerrar una ubicación antes de que establezcas tus piezas puede cortar la línea que necesita Onslaught, Iron Man o Spectrum."}
+  ],
+  reveal:[
+   {name:"Control anti-Al revelar",cards:["Cosmo"],reason:"Cosmo evita que se resuelvan tus efectos Al revelar en su ubicación; reparte los combos y no dependas de una sola ubicación."},
+   {name:"Control de última jugada",cards:["Alioth"],reason:"Alioth quita el texto de los personajes rivales que aún no se revelaron en su ubicación. La prioridad y el lugar donde termines la jugada importan."}
+  ],
+  negative:[
+   {name:"Control anti-Al revelar",cards:["Cosmo","Red Guardian"],reason:"Cosmo puede impedir que Mister Negative active su efecto en una ubicación; Red Guardian puede quitar el texto de una carta enemiga de poco poder allí."},
+   {name:"Control de última jugada",cards:["Alioth"],reason:"Si conserva la prioridad, Alioth puede quitar el texto de cartas aún no reveladas en su ubicación y apagar piezas de la combinación."}
+  ],
+  afflict:[
+   {name:"Continuo defensivo",cards:["Luke Cage"],reason:"Luke Cage impide que reduzcan el poder de las cartas de su dueño. Si no consigues quitarle su habilidad, tus aflicciones pierden gran parte del impacto."},
+   {name:"Control de Continuos",cards:["Enchantress","Rogue"],reason:"Pueden desactivar o robar la protección de Luke Cage si coinciden en la ubicación."}
+  ],
+  zoo:[
+   {name:"Anti-zoo",cards:["Killmonger"],reason:"Destruye todas las cartas de coste 1 y puede barrer una parte importante de una mesa ancha. Evita comprometer todas tus piezas pequeñas antes de identificarlo."},
+   {name:"Control de ubicaciones",cards:["Storm","Professor X"],reason:"Reducen el espacio donde puedes desplegar muchas cartas y dificultan repartir poder entre las tres ubicaciones."}
+  ],
+  ramp:[
+   {name:"Control de tempo",cards:["Sandman"],reason:"Aumenta el coste de las cartas el turno siguiente y puede impedir una jugada grande de varias cartas; adelanta tus piezas clave cuando tengas oportunidad."},
+   {name:"Control de cartas grandes",cards:["Shang-Chi","Shadow King"],reason:"Shang-Chi elimina una carta de 10 o más de poder y Shadow King reinicia el poder en su ubicación. No reveles toda tu fuerza en una sola línea."}
+  ]
+ };
  const targetCurve={0:1,1:2,2:3,3:3,4:2,5:1,6:1};
 
  function norm(value){return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim()}
@@ -317,6 +359,11 @@
   if(!html.length)html.push('<article class="synergy-item"><strong>Plan mixto</strong><p>No aparece un paquete clásico repetido. La curva y las alternativas por energía pesan más que forzar un arquetipo.</p></article>');
   target.innerHTML=html.join("")
  }
+ function renderCounters(list){
+  const target=app.querySelector("[data-counters]"),plan=profile(list).main;
+  if(list.length<2||!plan||!counterGuides[plan]){target.innerHTML='<div class="empty-analysis" style="min-height:90px"><p>Añade dos o más cartas del mismo plan para detectar respuestas rivales.</p></div>';return}
+  target.innerHTML=counterGuides[plan].map(guide=>'<article class="synergy-item"><strong>'+esc(guide.name)+'</strong><div class="links" style="margin-top:6px">'+guide.cards.map(name=>{const card=cardForName(name);return card?'<span class="pill">'+esc(card.name)+' · '+card.cost+' energía</span>':""}).join("")+'</div><p>'+esc(guide.reason)+'</p></article>').join("")
+ }
  function scoreCandidate(card,base,selected){
   selected=selected||base;
   const tags=cardTags(card),dominant=profile(selected).main,links=selected.filter(other=>pairMatches(card,other));
@@ -400,7 +447,7 @@
  function renderAnalysis(){
   const known=recognizedDeck(),count=deck.filter(Boolean).length;
   app.querySelectorAll("[data-deck-count]").forEach(node=>node.textContent=count+"/12");
-  renderAnalysisDeck(known);renderCurve(known);renderPlan(known);renderProbabilities(known,profile(known).main);renderSynergies(known);renderSwapSuggestions(known);renderSelectedLocation()
+  renderAnalysisDeck(known);renderCurve(known);renderPlan(known);renderProbabilities(known,profile(known).main);renderSynergies(known);renderCounters(known);renderSwapSuggestions(known);renderSelectedLocation()
  }
  function renderSlots(){
   const target=app.querySelector("[data-slots]");
