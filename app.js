@@ -302,7 +302,7 @@
  }
  function renderSwapSuggestions(list){
   const target=app.querySelector("[data-swaps]");
-  if(list.length<5){target.innerHTML='<div class="empty-analysis" style="min-height:90px"><p>Con cinco cartas o más puedo comparar cambios del mismo coste y buscar una sinergia mejor.</p></div>';return}
+  if(list.length<5){target.innerHTML='<div class="empty-analysis" style="min-height:90px"><p>Con cinco cartas o más puedo comparar cambios de coste parecido y buscar una sinergia mejor.</p></div>';return}
   const dominant=profile(list).main,existingScore=new Map(list.map(card=>[card.id,scoreCandidate(card,list.filter(other=>other.id!==card.id),list.filter(other=>other.id!==card.id)).score]));
   const weak=[...list].sort((a,b)=>(existingScore.get(a.id)||0)-(existingScore.get(b.id)||0)).slice(0,3),options=[];
   weak.forEach(old=>{
