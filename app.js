@@ -175,7 +175,7 @@
  function turnAdvice(turn,cards,spent,played){
   if(!cards.length)return "Guarda la energía si no tienes una jugada que avance tu plan.";
   const special=specialLineAdvice(cards,played);
-  if(special)return special+(spent<turn?" Te sobran "+(turn-spent)+" de energía; completa con una carta barata solo si no estropea el combo.":"");
+  if(special)return special;
   let card=cards.find(item=>played.some(other=>pairMatches(item,other))||cards.some(other=>other!==item&&pairMatches(item,other)));
   if(card){
    let partner=played.find(other=>pairMatches(card,other))||cards.find(other=>other!==card&&pairMatches(card,other));
@@ -184,13 +184,14 @@
   return spent===turn?"Curva limpia: gastas toda la energía; conserva el espacio de ubicación para tu siguiente pieza.":"Juega "+cards.map(item=>item.name).join(" + ")+", gastas "+spent+" de "+turn+" y mantienes una alternativa para el turno siguiente."
  }
  function buildTurnPlan(list,turnLength){
-  const remaining=[...list],played=[],turns=[],main=profile(list).main;
+  const remaining=[...list],played=[],turns=[],main=profile(list).main;let x23BonusTurn=0;
   for(let turn=1;turn<=turnLength;turn++){
-   const bonus=x23Bonus(played),energy=turn+bonus,choice=bestTurnSubset(remaining,energy,played,turn,turnLength,main);
+   const bonus=turn===x23BonusTurn?1:0,energy=turn+bonus,choice=bestTurnSubset(remaining,energy,played,turn,turnLength,main);
    const ordered=orderTurnCards(choice.cards),costs=Object.fromEntries(ordered.map(card=>[card.id,plannedCost(card,played)]));
    ordered.forEach(card=>{const index=remaining.findIndex(item=>item.id===card.id);if(index>=0)remaining.splice(index,1)});
    turns.push({turn,energy,bonus,cards:ordered,costs,spent:choice.spent,playedBefore:[...played],note:turnAdvice(turn,ordered,choice.spent,played)});
    played.push(...ordered)
+   if(!x23BonusTurn&&x23Bonus(played))x23BonusTurn=turn+1
   }
   return turns
  }
@@ -226,7 +227,7 @@
   const turns=buildTurnPlan(list,Number(app.querySelector("[data-game-length]").value));
   target.innerHTML=turns.map(row=>{
    const cardsHtml=row.cards.length?'<div class="turn-cards">'+row.cards.map(card=>{const detail=row.costs[card.id],costLabel=detail.discount?card.cost+'→'+detail.cost+'*':detail.cost;return '<span class="turn-card"><b>'+costLabel+'</b> '+esc(card.name)+' <span class="muted">· '+card.power+'</span></span>'}).join("")+'</div>':'<span class="muted">Sin jugada propuesta</span>';
-   const energyLabel=row.spent+'/'+row.turn+' energía'+(row.bonus?' (hasta '+row.energy+' si se activa X-23)':'');
+   const energyLabel=row.spent+'/'+row.turn+' energía'+(row.bonus?' (+1 de X-23 disponible)':'');
    return '<article class="turn"><div class="turn-label">TURNO '+row.turn+'<small>'+energyLabel+'</small></div><div class="turn-content">'+cardsHtml+'<div class="turn-note">'+esc(row.note)+'</div></div></article>'
   }).join("");
   const deathRows=turns.flatMap(row=>row.cards.filter(card=>row.costs[card.id].discount).map(card=>({card,...row.costs[card.id]})));
